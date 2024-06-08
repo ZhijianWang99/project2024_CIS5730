@@ -33,13 +33,14 @@ public class DataManager {
 			JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject) parser.parse(response);
 			String status = (String)json.get("status");
+			
 
 
 			if (status.equals("success")) {
 				JSONObject data = (JSONObject)json.get("data");
 				String fundId = (String)data.get("_id");
 				String name = (String)data.get("name");
-				String description = (String)data.get("descrption");
+				String description = (String)data.get("description");  // error1: descrption -> description
 				Organization org = new Organization(fundId, name, description);
 
 				JSONArray funds = (JSONArray)data.get("funds");
@@ -92,7 +93,7 @@ public class DataManager {
 
 			Map<String, Object> map = new HashMap<>();
 			map.put("_id", id);
-			String response = client.makeRequest("/findContributrNameById", map);
+			String response = client.makeRequest("/findContributorNameById", map); // error2: /findContributrNameById -> /findContributorNameById
 
 			JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject) parser.parse(response);

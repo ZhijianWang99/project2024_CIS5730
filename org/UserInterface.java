@@ -30,14 +30,40 @@ public class UserInterface {
 				System.out.println("Enter the fund number to see more information.");
 			}
 			System.out.println("Enter 0 to create a new fund");
-			int option = in.nextInt();
-			in.nextLine();
-			if (option == 0) {
-				createFund(); 
+			
+			System.out.println("Enter 'q' or 'quit' to exit.");
+			
+			String inputString = in.nextLine();
+
+			if (inputString.equals("quit") || inputString.equals("q")) {
+				System.out.println("Good bye!");
+				break;
 			}
-			else {
-				displayFund(option);
+			
+			try {
+				
+				int option = Integer.parseInt(inputString);
+
+				if (option == 0) {
+					createFund();
+				} else if (option>0 && option-1<org.getFunds().size() ) {
+					displayFund(option);
+				} else {
+					System.out.println("Invalid fund number! Please enter a valid fund number or 0 to create a new fund, or enter 'q' or 'quit' to exit. There are " +String.valueOf(org.getFunds().size())+" funds now.");
+				}
+			} catch (NumberFormatException e) {
+				System.out.println("Invalid input! Please enter a valid fund number, 0 to create a new fund, or 'q' or 'quit' to exit.");
 			}
+			
+//			int option = in.nextInt();
+//			in.nextLine();
+//			if (option == 0) {
+//				createFund(); 
+//			}
+//			else {
+//				displayFund(option);
+//			}
+			
 		}			
 			
 	}
@@ -72,12 +98,17 @@ public class UserInterface {
 		System.out.println("Target: $" + fund.getTarget());
 		
 		List<Donation> donations = fund.getDonations();
+		long totalDonationAmount = 0;
 		System.out.println("Number of donations: " + donations.size());
 		for (Donation donation : donations) {
+			totalDonationAmount += donation.getAmount();
 			System.out.println("* " + donation.getContributorName() + ": $" + donation.getAmount() + " on " + donation.getDate());
 		}
-	
 		
+		double percentageGot=(double)totalDonationAmount/fund.getTarget();
+		percentageGot*=100;
+        System.out.printf("Total donation amount: $%d (%.2f%% of target)\n", totalDonationAmount,percentageGot);
+
 		System.out.println("Press the Enter key to go back to the listing of funds");
 		in.nextLine();
 		
@@ -92,7 +123,7 @@ public class UserInterface {
 		
 		String login = args[0];
 		String password = args[1];
-		
+		System.out.println(login+" "+password);
 		
 		Organization org = ds.attemptLogin(login, password);
 		

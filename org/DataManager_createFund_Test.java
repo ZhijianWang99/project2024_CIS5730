@@ -37,5 +37,77 @@ public class DataManager_createFund_Test {
 		assertEquals(10000, f.getTarget());
 		
 	}
+	
+	@Test
+    public void testUnsuccessfulCreation() {
+        DataManager dm = new DataManager(new WebClient("localhost", 3001) {
+            @Override
+            public String makeRequest(String resource, Map<String, Object> queryParams) {
+                return "{\"status\":\"not found\"}";
+            }
+        });
+
+        Fund f = dm.createFund("12345", "new fund", "this is the new fund", 10000);
+
+        assertNull(f);
+    }
+	
+	
+	@Test
+    public void testStatusNull() {
+        DataManager dm = new DataManager(new WebClient("localhost", 3001) {
+            @Override
+            public String makeRequest(String resource, Map<String, Object> queryParams) {
+                return "{}";
+            }
+        });
+
+        Fund f = dm.createFund("12345", "new fund", "this is the new fund", 10000);
+
+        assertNull(f);
+    }
+
+    @Test
+    public void testRespEmpty() {
+        DataManager dm = new DataManager(new WebClient("localhost", 3001) {
+            @Override
+            public String makeRequest(String resource, Map<String, Object> queryParams) {
+                return "";
+            }
+        });
+
+        Fund f = dm.createFund("12345", "new fund", "this is the new fund", 10000);
+
+        assertNull(f);
+    }
+
+    @Test
+    public void testRespNull() {
+        DataManager dm = new DataManager(new WebClient("localhost", 3001) {
+            @Override
+            public String makeRequest(String resource, Map<String, Object> queryParams) {
+                return null;
+            }
+        });
+
+        Fund f = dm.createFund("12345", "new fund", "this is the new fund", 10000);
+
+        assertNull(f);
+    }
+
+    @Test
+    public void testException() {
+        DataManager dm = new DataManager(new WebClient("localhost", 3001) {
+            @Override
+            public String makeRequest(String resource, Map<String, Object> queryParams) {
+                throw new RuntimeException("Exception occurred");
+            }
+        });
+
+        Fund f = dm.createFund("12345", "new fund", "this is the new fund", 10000);
+
+        assertNull(f);
+    }
+
 
 }
