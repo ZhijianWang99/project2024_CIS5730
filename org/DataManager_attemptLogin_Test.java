@@ -91,6 +91,18 @@ public class DataManager_attemptLogin_Test {
         assertNull(org);
     }
 
+    @Test(expected=IllegalStateException.class)
+    public void testCommunicationError() {
+        DataManager dm = new DataManager(new WebClient("localhost", 3001) {
+            @Override
+            public String makeRequest(String resource, Map<String, Object> queryParams) {
+                throw new IllegalArgumentException("Something bad!") ;
+            }
+        });
+
+        Organization org = dm.attemptLogin("user", "password") ;
+    }
+
     @Test
     public void testStatusNull() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
