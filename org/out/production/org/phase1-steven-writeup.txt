@@ -1,0 +1,5 @@
+Task 1.10:
+Made changes to UserInterface. Implemented static method formatDate() to format dates given Donation object using basic
+string manipulation. The formatted String is passed to the line displaying donation information in UserInterface.
+
+Testing for the static method can be found in the UserInterfaceTest.java file.

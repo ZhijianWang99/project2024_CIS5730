@@ -101,8 +101,7 @@ public class UserInterface {
 		long totalDonationAmount = 0;
 		System.out.println("Number of donations: " + donations.size());
 		for (Donation donation : donations) {
-			totalDonationAmount += donation.getAmount();
-			System.out.println("* " + donation.getContributorName() + ": $" + donation.getAmount() + " on " + donation.getDate());
+			System.out.println("* " + donation.getContributorName() + ": $" + donation.getAmount() + " on " + formatDate(donation));
 		}
 		
 		double percentageGot=(double)totalDonationAmount/fund.getTarget();
@@ -115,7 +114,15 @@ public class UserInterface {
 		
 		
 	}
-	
+
+	// task 1.10
+	public static String formatDate(Donation donation) {
+		if (donation == null || donation.getDate() == null) {
+			return "--/--/----" ;
+		}
+		String[] dateArr = donation.getDate().split("T")[0].split("-") ;
+		return String.format("%s/%s/%s", dateArr[1], dateArr[2], dateArr[0]) ;
+	}
 	
 	public static void main(String[] args) {
 		
