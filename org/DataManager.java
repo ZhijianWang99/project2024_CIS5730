@@ -77,8 +77,7 @@ public class DataManager {
 			else return null;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
-			return null;
+			throw new IllegalStateException("Error Occurred in Login Attempt") ;
 		}
 	}
 

@@ -1,3 +1,11 @@
+Task 1.9:
+Changes to DataManager: throw IllegalStateException in try-catch block in attemptLogin method
+Changes to UserInterface: Introduced try-catch block for exception thrown in attemptLogin from DataManager object.
+Testing for implementation in DataManager can be found in DataManager_attemptLogin_Test.java file.
+- Method: testCommunicationError()
+Testing for implementation in UserInterface can be found in UserInterfaceTest.java file.
+
+
 Task 1.10:
 Made changes to UserInterface. Implemented static method formatDate() to format dates given Donation object using basic
 string manipulation. The formatted String is passed to the line displaying donation information in UserInterface.
