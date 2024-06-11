@@ -1,5 +1,7 @@
 import static org.junit.Assert.*;
+
 import java.util.Map;
+
 import org.junit.Test;
 
 public class DataManager_attemptLogin_Test {
@@ -20,7 +22,7 @@ public class DataManager_attemptLogin_Test {
         assertEquals("name1", org.getName());
         assertEquals("description1", org.getDescription());
     }
-    
+
     @Test
     public void testSuccessfulLoginAndFund() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
@@ -45,7 +47,7 @@ public class DataManager_attemptLogin_Test {
         assertEquals(1200, fund.getTarget());
         assertTrue(fund.getDonations().isEmpty());
     }
-    
+
     @Test
     public void testSuccessfulLoginAndFundPlusDonation() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
@@ -90,17 +92,19 @@ public class DataManager_attemptLogin_Test {
 
         assertNull(org);
     }
-    @Test(expected=IllegalStateException.class)
+
+    @Test(expected = IllegalStateException.class)
     public void testCommunicationError() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override
             public String makeRequest(String resource, Map<String, Object> queryParams) {
-                throw new IllegalArgumentException("Something bad!") ;
+                throw new IllegalArgumentException("Something bad!");
             }
         });
 
-        Organization org = dm.attemptLogin("user", "password") ;
+        Organization org = dm.attemptLogin("user", "password");
     }
+
     @Test(expected = IllegalStateException.class)
     public void testStatusNull() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
@@ -162,13 +166,10 @@ public class DataManager_attemptLogin_Test {
         }
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testAttemptLoginServerError() {
         WebClient client = new TestWebClient("localhost", 3001);
         DataManager dataManager = new DataManager(client);
-
-        assertThrows(IllegalStateException.class, () -> {
-            dataManager.attemptLogin("testLogin", "testPassword");
-        });
+        dataManager.attemptLogin("testLogin", "testPassword");
     }
 }

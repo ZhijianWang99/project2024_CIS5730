@@ -133,57 +133,42 @@ public class UserInterface {
         double percentageGot = (double) totalDonationAmount / fund.getTarget();
         percentageGot *= 100;
         System.out.printf("Total donation amount: $%d (%.2f%% of target)\n", totalDonationAmount, percentageGot);
+        System.out.println("Press the Enter key to go back to the listing of funds");
+        in.nextLine();
+    }
 
-		System.out.println("Press the Enter key to go back to the listing of funds");
-		in.nextLine();
+    // task 1.10
+    public static String formatDate(Donation donation) {
+        if (donation == null || donation.getDate() == null) {
+            return "--/--/----";
+        }
+        String[] dateArr = donation.getDate().split("T")[0].split("-");
+        return String.format("%s/%s/%s", dateArr[1], dateArr[2], dateArr[0]);
+    }
 
+    public static void main(String[] args) {
+        DataManager ds = new DataManager(new WebClient("localhost", 3001));
+        String login = args[0];
+        String password = args[1];
+        System.out.println(login + " " + password);
+        Organization org = null;
+        try {
+            org = ds.attemptLogin(login, password);
+        } catch (Exception e) {
+            if (e instanceof IllegalStateException) {
+                System.out.println("Error in communicating with server");
+            } else {
+                e.printStackTrace();
+            }
+            return;
+        }
 
-
-	}
-
-	// task 1.10
-	public static String formatDate(Donation donation) {
-		if (donation == null || donation.getDate() == null) {
-			return "--/--/----" ;
-		}
-		String[] dateArr = donation.getDate().split("T")[0].split("-") ;
-		return String.format("%s/%s/%s", dateArr[1], dateArr[2], dateArr[0]) ;
-	}
-
-	public void start(String[] args) {
-
-	}
-
-	public static void main(String[] args) {
-
-		DataManager ds = new DataManager(new WebClient("localhost", 3001));
-
-		String login = args[0];
-		String password = args[1];
-		System.out.println(login+" "+password);
-		Organization org = null;
-
-		try {
-			org = ds.attemptLogin(login, password);
-		} catch (Exception e) {
-			if (e instanceof IllegalStateException) {
-				System.out.println("Error in communicating with server") ;
-			} else {
-				e.printStackTrace();
-			}
-			return ;
-		}
-
-		if (org == null) {
-			System.out.println("Login failed.");
-		}
-		else {
-
-			UserInterface ui = new UserInterface(ds, org);
-
-			ui.start();
-
-		}
-	}
+        if (org == null) {
+            System.out.println("Login failed.");
+        } else {
+            UserInterface ui = new UserInterface(ds, org);
+            ui.start();
+        }
+    }
 
 }
