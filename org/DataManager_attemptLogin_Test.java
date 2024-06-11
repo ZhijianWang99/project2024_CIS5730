@@ -91,7 +91,7 @@ public class DataManager_attemptLogin_Test {
         assertNull(org);
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testStatusNull() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override
@@ -102,10 +102,9 @@ public class DataManager_attemptLogin_Test {
 
         Organization org = dm.attemptLogin("user", "password");
 
-        assertNull(org);
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testRespEmpty() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override
@@ -115,11 +114,9 @@ public class DataManager_attemptLogin_Test {
         });
 
         Organization org = dm.attemptLogin("user", "password");
-
-        assertNull(org);
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testRespNull() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override
@@ -129,11 +126,9 @@ public class DataManager_attemptLogin_Test {
         });
 
         Organization org = dm.attemptLogin("user", "password");
-
-        assertNull(org);
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testException() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override
@@ -143,8 +138,27 @@ public class DataManager_attemptLogin_Test {
         });
 
         Organization org = dm.attemptLogin("user", "password");
-
-        assertNull(org);
     }
 
+    public static class TestWebClient extends WebClient {
+
+        public TestWebClient(String host, int port) {
+            super(host, port);
+        }
+
+        @Override
+        public String makeRequest(String endpoint, Map<String, Object> map) {
+            throw new RuntimeException("Server communication error");
+        }
+    }
+
+    @Test
+    public void testAttemptLoginServerError() {
+        WebClient client = new TestWebClient("localhost", 3001);
+        DataManager dataManager = new DataManager(client);
+
+        assertThrows(IllegalStateException.class, () -> {
+            dataManager.attemptLogin("testLogin", "testPassword");
+        });
+    }
 }
