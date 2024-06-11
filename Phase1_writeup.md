@@ -1,3 +1,6 @@
+Project Structure Changes:
+Split files in org folder to respective source (src) and test (tst) folders. Build target can be found in out/. 
+
 Required tasks: (Lei Sun)
 
 Task 1.1: Three test files are completed: DataManager_createFund_Test.java, DataManager_attemptLogin_Test.java, and DataManager_getContributorName_Test.java

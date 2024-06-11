@@ -127,7 +127,8 @@ public class UserInterface {
         System.out.println("Number of donations: " + donations.size());
         for (Donation donation : donations) {
             totalDonationAmount += donation.getAmount();
-            System.out.println("* " + donation.getContributorName() + ": $" + donation.getAmount() + " on " + donation.getDate());
+            System.out.println("* " + donation.getContributorName() + ": $"
+                    + donation.getAmount() + " on " + formatDate(donation));
         }
 
         double percentageGot = (double) totalDonationAmount / fund.getTarget();
