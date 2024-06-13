@@ -12,9 +12,13 @@ import org.json.simple.parser.JSONParser;
 public class DataManager {
 
 	private final WebClient client;
+	
+	// Task 2.1: Cache for storing contributor data
+	private final Map<String, String> contributorDataCache;
 
 	public DataManager(WebClient client) {
 		this.client = client;
+		this.contributorDataCache = new HashMap<>();
 	}
 
 	/**
@@ -23,18 +27,32 @@ public class DataManager {
 	 * @return an Organization object if successful; null if unsuccessful
 	 */
 	public Organization attemptLogin(String login, String password) {
+		
+		// Task 2.2: Throw exception
+		if (client == null) {
+            throw new IllegalStateException("Client is null!");
+        }
+		if (password == null) {
+            throw new IllegalArgumentException("Password is null!");
+        }
+        if (login == null) {
+            throw new IllegalArgumentException("Login is null!");
+        }
 
 		try {
 			Map<String, Object> map = new HashMap<>();
 			map.put("login", login);
 			map.put("password", password);
 			String response = client.makeRequest("/findOrgByLoginAndPassword", map);
+			
+			// Task 2.2: Throw exception
+			if (response == null) {
+                throw new IllegalStateException("WebClient response is null!");
+            }
 
 			JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject) parser.parse(response);
 			String status = (String)json.get("status");
-			
-
 
 			if (status.equals("success")) {
 				JSONObject data = (JSONObject)json.get("data");
@@ -74,7 +92,11 @@ public class DataManager {
 
 				return org;
 			}
-			else return null;
+			// Task 2.2: Throw exception rather than returning null
+			else {
+                throw new IllegalStateException("WebClient respond with invalid status!");
+            }
+			//else return null;
 		}
 		catch (Exception e) {
 			// Communication error with the server
@@ -88,27 +110,54 @@ public class DataManager {
 	 * @return the name of the contributor on success; null if no contributor is found
 	 */
 	public String getContributorName(String id) {
+		
+		// Task 2.2: Throw exception
+		if (client == null) {
+            throw new IllegalStateException("Client is null!");
+        }
+        if (id == null) {
+            throw new IllegalArgumentException("ID is null!");
+        }
+		
+		// Task 21: Check with the cache first
+        if (contributorDataCache.containsKey(id)) {
+        	String outputCache=contributorDataCache.get(id);
+            return outputCache;
+        }
 
 		try {
 
 			Map<String, Object> map = new HashMap<>();
-			map.put("_id", id);
-			String response = client.makeRequest("/findContributorNameById", map); // error2: /findContributrNameById -> /findContributorNameById
+			map.put("id", id); // error2: "_id" -> "id"
+			String response = client.makeRequest("/findContributorNameById", map); // error3: /findContributrNameById -> /findContributorNameById
 
+			// Task 2.2: Throw exception
+			if (response == null) {
+                throw new IllegalStateException("WebClient response is null!");
+            }
+			
 			JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject) parser.parse(response);
 			String status = (String)json.get("status");
 
 			if (status.equals("success")) {
 				String name = (String)json.get("data");
+				// Task 2.1: Add contributor name to cache
+				contributorDataCache.put(id, name);
 				return name;
 			}
-			else return null;
+			// Task 2.2: Throw exception rather than returning null
+			else {
+                throw new IllegalStateException("WebClient respond with invalid status!");
+            }
+			//else return null;
 
 
 		}
 		catch (Exception e) {
-			return null;
+			// Task 2.2: Throw exception rather than returning null
+			throw new IllegalStateException("Error while communicating with the server", e);
+			//return null;
 		}	
 	}
 
@@ -117,6 +166,20 @@ public class DataManager {
 	 * @return a new Fund object if successful; null if unsuccessful
 	 */
 	public Fund createFund(String orgId, String name, String description, long target) {
+		
+		// Task 2.2: Throw exception 
+		if (client == null) {
+            throw new IllegalStateException("Client is null!");
+        }
+        if (orgId == null) {
+            throw new IllegalArgumentException("Organization ID is null!");
+        }
+        if (name == null) {
+            throw new IllegalArgumentException("Name is null!");
+        }
+        if (description == null) {
+            throw new IllegalArgumentException("Description is null!");
+        }
 
 		try {
 
@@ -126,6 +189,11 @@ public class DataManager {
 			map.put("description", description);
 			map.put("target", target);
 			String response = client.makeRequest("/createFund", map);
+			
+			// Task 2.2: Throw exception
+			if (response == null) {
+                throw new IllegalStateException("WebClient response is null!");
+            }
 
 			JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject) parser.parse(response);
@@ -136,12 +204,18 @@ public class DataManager {
 				String fundId = (String)fund.get("_id");
 				return new Fund(fundId, name, description, target);
 			}
-			else return null;
+			// Task 2.2: Throw exception rather than returning null
+			else {
+                throw new IllegalStateException("WebClient respond with invalid status!");
+            }
+			//else return null;
 
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			return null;
+			// Task 2.2: Throw exception rather than returning null
+			throw new IllegalStateException("Error while communicating with the server", e);
+			//return null;
 		}	
 	}
 

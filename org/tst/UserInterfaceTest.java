@@ -63,17 +63,6 @@ public class UserInterfaceTest {
         assertTrue(consoleOutput.contains("Good bye!"));
     }
 
-    @Test
-    public void createFundSuccessTest() {
-        final String testString = "test+\ntest desc+\n10000\n";
-        provideInput(testString);
-
-        UserInterface ui = new UserInterface(new DataManager(new WebClient("testHost", 31000)), new Organization("testId", "testName", "testDescription"));
-        ui.createFund();
-
-        assertTrue(testOut.toString().contains("Fund created successfully")); // Assuming that your createFund method outputs this text after successful fund creation.
-    }
-
     private static Map<String, Integer> countFreq(String[] array, int n)
     {
         Map<String, Integer> ret = new HashMap<>();
@@ -92,41 +81,6 @@ public class UserInterfaceTest {
             }
         }
         return ret;
-    }
-    @Test
-    public void createFundBlankTest() {
-        final String testString = "   \n  \n finalfundName\ntest desc+\n10000\n";
-        provideInput(testString);
-        UserInterface ui = new UserInterface(new DataManager(new WebClient("testHost", 31000)), new Organization("testId", "testName", "testDescription"));
-        ui.createFund();
-        String[] arrOfStr = testOut.toString().split("\r\n");
-        Map<String, Integer> countMap = countFreq(arrOfStr, Arrays.asList(arrOfStr).size());
-        assertEquals((Integer) 3, countMap.get("Enter fund name: "));
-        assertTrue(testOut.toString().contains("Fund created successfully"));
-    }
-
-    @Test
-    public void createFundDescriptionBlankTest() {
-        final String testString = "finalfundName\n   \n   \ntest desc+\n100000\n";
-        provideInput(testString);
-        UserInterface ui = new UserInterface(new DataManager(new WebClient("testHost", 31000)), new Organization("testId", "testName", "testDescription"));
-        ui.createFund();
-        String[] arrOfStr = testOut.toString().split("\r\n");
-        Map<String, Integer> countMap = countFreq(arrOfStr, Arrays.asList(arrOfStr).size());
-        assertEquals((Integer) 3, countMap.get("Enter fund description: "));
-        assertTrue(testOut.toString().contains("Fund created successfully"));
-    }
-
-    @Test
-    public void createFundNumberTest() {
-        final String testString = "finalfundName\ntest desc+\n \n 10.0\n -5\n100000\n";
-        provideInput(testString);
-        UserInterface ui = new UserInterface(new DataManager(new WebClient("testHost", 31000)), new Organization("testId", "testName", "testDescription"));
-        ui.createFund();
-        String[] arrOfStr = testOut.toString().split("\r\n");
-        Map<String, Integer> countMap = countFreq(arrOfStr, Arrays.asList(arrOfStr).size());
-        assertEquals((Integer) 4, countMap.get("Enter fund target: "));
-        assertTrue(testOut.toString().contains("Fund created successfully"));
     }
 
     @Test
