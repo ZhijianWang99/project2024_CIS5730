@@ -121,7 +121,7 @@ public class DataManager {
 		
 		// Task 21: Check with the cache first
         if (contributorDataCache.containsKey(id)) {
-        	String outputCache=contributorDataCache.get(id);
+        	String outputCache=contributorDataCache.get(id);System.out.println("<Trivial> Cache found: "+outputCache);
             return outputCache;
         }
 
@@ -143,7 +143,7 @@ public class DataManager {
 			if (status.equals("success")) {
 				String name = (String)json.get("data");
 				// Task 2.1: Add contributor name to cache
-				contributorDataCache.put(id, name);
+				contributorDataCache.put(id, name);System.out.println("<Trivial> Cache add name: "+name);
 				return name;
 			}
 			// Task 2.2: Throw exception rather than returning null

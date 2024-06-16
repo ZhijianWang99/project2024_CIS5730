@@ -208,7 +208,7 @@ public class UserInterface {
         DataManager ds = new DataManager(new WebClient("localhost", 3001));
         String login = args[0];
         String password = args[1];
-        System.out.println(login + " " + password);
+        System.out.println("Login and Password: "+login + " " + password);
         Organization org = null;
         
 //        try {
@@ -228,16 +228,17 @@ public class UserInterface {
                 org = ds.attemptLogin(login, password);
                 break;
             } catch (IllegalStateException e) {
-                System.out.println("Error in communicating with the server: " + e.getMessage());
-                System.out.println("Want to retry? (Y/y for Yes, anything else for No)");
+                System.out.println("Error message: " + e.getMessage());
+                System.out.println("Want to retry? (Enter Y/y for Yes, or anything else for No)");
                 Scanner scanner = new Scanner(System.in);
-                String response = scanner.nextLine().trim().toLowerCase();
-                System.out.println(response);
-                if (!response.equals("y")) {
+                String userRsp = scanner.nextLine().trim().toLowerCase();
+                
+                if (!userRsp.equals("y")) {
                     return;
                 }
+                
             } catch (Exception e) {
-                System.out.println("An unexpected error occurred: " + e.getMessage());
+                System.out.println("Error unexpected: " + e.getMessage());
                 return;
             }
         }
