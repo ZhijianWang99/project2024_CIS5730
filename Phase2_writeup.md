@@ -3,7 +3,7 @@ Split files in org folder to respective source (src) and test (tst) folders. Bui
 
 Required tasks: (Lei Sun)
 
-Task 2.1: lines 16-17, 122-126 and 145 are supplemented to enable the cache for contributor data storage
+Task 2.1: lines 16-17, 122-126 and 145-146 are supplemented to enable the cache for contributor data storage
 
 Task 2.2: In attemptLogin, getContributorName and createFund methods, codes are supplemented to throw exceptions when encountering null and they are all labeled with "//Task 2.2" 
           In addition, in UserInterface.main method, a while loop labeled with "// Task 2.2: Retry operation" is added to enable the retry block for users
