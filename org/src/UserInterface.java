@@ -162,22 +162,37 @@ public class UserInterface {
         percentageGot *= 100;
         System.out.printf("Total donation amount: $%d (%.2f%% of target)\n", totalDonationAmount, percentageGot);
         System.out.println("Press the Enter key to go back to the listing of funds");
-        in.nextLine();
+        System.out.println("To Delete the Fund: type 'delete' and Press Enter") ;
+        String input = in.nextLine();
 
-//        List<Donation> donations = fund.getDonations();
-//        long totalDonationAmount = 0;
-//        System.out.println("Number of donations: " + donations.size());
-//        for (Donation donation : donations) {
-//            totalDonationAmount += donation.getAmount();
-//            System.out.println("* " + donation.getContributorName() + ": $"
-//                    + donation.getAmount() + " on " + formatDate(donation));
-//        }
-//
-//        double percentageGot = (double) totalDonationAmount / fund.getTarget();
-//        percentageGot *= 100;
-//        System.out.printf("Total donation amount: $%d (%.2f%% of target)\n", totalDonationAmount, percentageGot);
-//        System.out.println("Press the Enter key to go back to the listing of funds");
-//        in.nextLine();
+        if (input == "delete") {
+            confirmDeleteFund(fundNumber) ;
+        }
+    }
+
+    public void confirmDeleteFund(int fundNumber) {
+        String input = "" ;
+        int attempts = 0 ;
+        while (attempts < 3) {
+            System.out.println("Y: Confirm Deletion?") ;
+            System.out.println("N: Cancel") ;
+            input = in.nextLine().trim() ;
+
+            if (input.equals("N") || input.equals("n")) {
+                System.out.println("Canceled Deletion.") ;
+                return ;
+            }
+
+
+            if (input.equals("Y") || input.equals("y")) {
+                System.out.println("Deleting Fund...") ;
+                // this.ds.deleteFund()
+                return ;
+            }
+
+            System.out.println("Invalid Input, attempts remaining before cancel: " + (3 - attempts)) ;
+            attempts++ ;
+        }
     }
     
     // Task 2.3: Method to aggregate the contributor donations
@@ -210,17 +225,6 @@ public class UserInterface {
         String password = args[1];
         System.out.println("Login and Password: "+login + " " + password);
         Organization org = null;
-        
-//        try {
-//            org = ds.attemptLogin(login, password);
-//        } catch (Exception e) {
-//            if (e instanceof IllegalStateException) {
-//                System.out.println("Error in communicating with server");
-//            } else {
-//                e.printStackTrace();
-//            }
-//            return;
-//        }
         
         // Task 2.2: Retry operation
         while (true) {
