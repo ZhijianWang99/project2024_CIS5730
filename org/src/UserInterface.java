@@ -1,5 +1,8 @@
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+
 
 public class UserInterface {
 
@@ -7,6 +10,9 @@ public class UserInterface {
     private DataManager dataManager;
     private Organization org;
     private Scanner in = new Scanner(System.in);
+    
+    // Task 2.3
+    private Map<String, Map<String, AggregatedDonation>> aggregatedDonationsCache = new HashMap<>();
 
     public UserInterface(DataManager dataManager, Organization org) {
         this.dataManager = dataManager;
@@ -108,7 +114,23 @@ public class UserInterface {
                 System.out.println("Fund target needs to be a integer number. Please enter again.");
             }
         }
-        System.out.println("Fund created successfully");
+        
+        
+        
+        try {
+            Fund newFund = dataManager.createFund(org.getId(), fundName, fundDescription, fundTarget);
+            if (newFund != null) {
+                org.addFund(newFund);
+                System.out.println("Fund created successfully");
+            } else {
+                System.out.println("Failed to create fund.");
+            }
+        } catch (IllegalStateException e) { 
+            System.out.println("Error in communicating with server: " + e.getMessage());
+        } catch (Exception e) { 
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
+        
     }
 
 
@@ -121,24 +143,59 @@ public class UserInterface {
         System.out.println("Name: " + fund.getName());
         System.out.println("Description: " + fund.getDescription());
         System.out.println("Target: $" + fund.getTarget());
-
+        
+        // Task 2.3 codes
         List<Donation> donations = fund.getDonations();
-        long totalDonationAmount = 0;
-        System.out.println("Number of donations: " + donations.size());
-        for (Donation donation : donations) {
-            totalDonationAmount += donation.getAmount();
-            System.out.println("* " + donation.getContributorName() + ": $"
-                    + donation.getAmount() + " on " + formatDate(donation));
+        if (!aggregatedDonationsCache.containsKey(fund.getId())) {
+            aggregatedDonationsCache.put(fund.getId(), aggregateDonationsByContributor(donations));
+        }
+        Map<String, AggregatedDonation> aggregatedDonations = aggregatedDonationsCache.get(fund.getId());
+
+        System.out.println("Aggregated donations:");
+        for (Map.Entry<String, AggregatedDonation> entry : aggregatedDonations.entrySet()) {
+            AggregatedDonation aggDonation = entry.getValue();
+            System.out.printf("* %s, %d donations, $%d total\n", entry.getKey(), aggDonation.count, aggDonation.totalAmount);
         }
 
+        long totalDonationAmount = aggregatedDonations.values().stream().mapToLong(agg -> agg.totalAmount).sum();
         double percentageGot = (double) totalDonationAmount / fund.getTarget();
         percentageGot *= 100;
         System.out.printf("Total donation amount: $%d (%.2f%% of target)\n", totalDonationAmount, percentageGot);
         System.out.println("Press the Enter key to go back to the listing of funds");
         in.nextLine();
+
+//        List<Donation> donations = fund.getDonations();
+//        long totalDonationAmount = 0;
+//        System.out.println("Number of donations: " + donations.size());
+//        for (Donation donation : donations) {
+//            totalDonationAmount += donation.getAmount();
+//            System.out.println("* " + donation.getContributorName() + ": $"
+//                    + donation.getAmount() + " on " + formatDate(donation));
+//        }
+//
+//        double percentageGot = (double) totalDonationAmount / fund.getTarget();
+//        percentageGot *= 100;
+//        System.out.printf("Total donation amount: $%d (%.2f%% of target)\n", totalDonationAmount, percentageGot);
+//        System.out.println("Press the Enter key to go back to the listing of funds");
+//        in.nextLine();
+    }
+    
+    // Task 2.3: Method to aggregate the contributor donations
+    private Map<String, AggregatedDonation> aggregateDonationsByContributor(List<Donation> donations) {
+        Map<String, AggregatedDonation> donationMap = new HashMap<>();
+        for (Donation donation : donations) {
+            String contributorName = donation.getContributorName();
+            if (!donationMap.containsKey(contributorName)) {
+                donationMap.put(contributorName, new AggregatedDonation());
+            }
+            AggregatedDonation aggDonation = donationMap.get(contributorName);
+            aggDonation.count++;
+            aggDonation.totalAmount += donation.getAmount();
+        }
+        return donationMap;
     }
 
-    // task 1.10
+    // Task 1.10
     public static String formatDate(Donation donation) {
         if (donation == null || donation.getDate() == null) {
             return "--/--/----";
@@ -151,18 +208,41 @@ public class UserInterface {
         DataManager ds = new DataManager(new WebClient("localhost", 3001));
         String login = args[0];
         String password = args[1];
-        System.out.println(login + " " + password);
+        System.out.println("Login and Password: "+login + " " + password);
         Organization org = null;
-        try {
-            org = ds.attemptLogin(login, password);
-        } catch (Exception e) {
-            if (e instanceof IllegalStateException) {
-                System.out.println("Error in communicating with server");
-            } else {
-                e.printStackTrace();
+        
+//        try {
+//            org = ds.attemptLogin(login, password);
+//        } catch (Exception e) {
+//            if (e instanceof IllegalStateException) {
+//                System.out.println("Error in communicating with server");
+//            } else {
+//                e.printStackTrace();
+//            }
+//            return;
+//        }
+        
+        // Task 2.2: Retry operation
+        while (true) {
+            try {
+                org = ds.attemptLogin(login, password);
+                break;
+            } catch (IllegalStateException e) {
+                System.out.println("Error message: " + e.getMessage());
+                System.out.println("Want to retry? (Enter Y/y for Yes, or anything else for No)");
+                Scanner scanner = new Scanner(System.in);
+                String userRsp = scanner.nextLine().trim().toLowerCase();
+                
+                if (!userRsp.equals("y")) {
+                    return;
+                }
+                
+            } catch (Exception e) {
+                System.out.println("Error unexpected: " + e.getMessage());
+                return;
             }
-            return;
         }
+        
 
         if (org == null) {
             System.out.println("Login failed.");
@@ -170,6 +250,12 @@ public class UserInterface {
             UserInterface ui = new UserInterface(ds, org);
             ui.start();
         }
+    }
+    
+    // Task 2.3: Define an AggregatedDonation class
+    private static class AggregatedDonation {
+        int count = 0;
+        long totalAmount = 0;
     }
 
 }
