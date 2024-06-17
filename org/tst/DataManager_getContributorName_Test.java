@@ -19,7 +19,7 @@ public class DataManager_getContributorName_Test {
         assertEquals("James Sun", name);
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testUnsuccessfulGetContributorName() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override
@@ -33,7 +33,7 @@ public class DataManager_getContributorName_Test {
         assertNull(name);
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testStatusNull() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override
@@ -47,7 +47,7 @@ public class DataManager_getContributorName_Test {
         assertNull(name);
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testRespEmpty() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override
@@ -61,7 +61,7 @@ public class DataManager_getContributorName_Test {
         assertNull(name);
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testRespNull() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override
@@ -75,7 +75,7 @@ public class DataManager_getContributorName_Test {
         assertNull(name);
     }
     
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testException() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override
