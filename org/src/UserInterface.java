@@ -1,7 +1,4 @@
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class UserInterface {
@@ -60,15 +57,6 @@ public class UserInterface {
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input! Please enter a valid fund number, 0 to create a new fund, or 'q' or 'quit' to exit.");
             }
-
-//			int option = in.nextInt();
-//			in.nextLine();
-//			if (option == 0) {
-//				createFund(); 
-//			}
-//			else {
-//				displayFund(option);
-//			}
 
         }
 
@@ -165,15 +153,15 @@ public class UserInterface {
         System.out.println("To Delete the Fund: type 'delete' and Press Enter") ;
         String input = in.nextLine();
 
-        if (input == "delete") {
-            confirmDeleteFund(fundNumber) ;
+        if (Objects.equals(input, "delete")) {
+            confirmDeleteFund(fund) ;
         }
     }
 
-    public void confirmDeleteFund(int fundNumber) {
+    public void confirmDeleteFund(Fund fund) {
         String input = "" ;
         int attempts = 0 ;
-        while (attempts < 3) {
+        while (attempts <= 3) {
             System.out.println("Y: Confirm Deletion?") ;
             System.out.println("N: Cancel") ;
             input = in.nextLine().trim() ;
@@ -183,10 +171,15 @@ public class UserInterface {
                 return ;
             }
 
-
             if (input.equals("Y") || input.equals("y")) {
                 System.out.println("Deleting Fund...") ;
-                // this.ds.deleteFund()
+                try {
+                    this.dataManager.deleteFund(fund.getId()) ;
+                    org.deleteFund(fund) ;
+                    aggregatedDonationsCache.remove(fund.getId()) ;
+                } catch (Exception e) {
+                    System.out.println("An unexpected error occurred: " + e.getMessage());
+                }
                 return ;
             }
 

@@ -263,4 +263,74 @@ public class DataManagerRobustnessTest {
 		
 	}
 
+	// tests for deleteFund
+
+	@Test(expected=IllegalStateException.class)
+	public void testDeleteFund_WebClientIsNull() {
+
+		dm = new DataManager(null);
+		dm.deleteFund("orgId");
+		fail("DataManager.createFund does not throw IllegalStateException when WebClient is null");
+
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testDeleteFund_OrgIdIsNull() {
+
+		dm = new DataManager(new WebClient("localhost", 3001));
+		dm.deleteFund(null);
+		fail("DataManager.createFund does not throw IllegalArgumentxception when orgId is null");
+
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testDeleteFund_WebClientCannotConnectToServer() {
+
+		// this assumes no server is running on port 3002
+		dm = new DataManager(new WebClient("localhost", 3002));
+		dm.deleteFund("orgId");
+		fail("DataManager.deleteFund does not throw IllegalStateException when WebClient cannot connect to server");
+
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testDeleteFund_WebClientReturnsNull() {
+
+		dm = new DataManager(new WebClient("localhost", 3001) {
+			@Override
+			public String makeRequest(String resource, Map<String, Object> queryParams) {
+				return null;
+			}
+		});
+		dm.deleteFund("orgId");
+		fail("DataManager.deleteFund does not throw IllegalStateException when WebClient returns null");
+	}
+
+
+	@Test(expected=IllegalStateException.class)
+	public void testDeleteFund_WebClientReturnsError() {
+		dm = new DataManager(new WebClient("localhost", 3001) {
+			@Override
+			public String makeRequest(String resource, Map<String, Object> queryParams) {
+				return "{\"status\":\"error\",\"error\":\"An unexpected database error occurred\"}";
+			}
+		});
+		dm.deleteFund("orgId") ;
+		fail("DataManager.deleteFund does not throw IllegalStateException when WebClient returns error");
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testDeleteFund_WebClientReturnsMalformedJSON() {
+
+		dm = new DataManager(new WebClient("localhost", 3001) {
+			@Override
+			public String makeRequest(String resource, Map<String, Object> queryParams) {
+				return "I AM NOT JSON!";
+			}
+		});
+		dm.deleteFund("orgId");
+		fail("DataManager.deleteFund does not throw IllegalStateException when WebClient returns malformed JSON");
+
+	}
+
 }

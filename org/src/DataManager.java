@@ -162,6 +162,41 @@ public class DataManager {
 	}
 
 	/**
+	 * This method requests to delete a fund using the /deleteFund endpoint the API
+	 * @param orgId - String for organization ID to be deleted
+	 * @return void
+	 */
+	public void deleteFund(String orgId) {
+		if (client == null) {
+			throw new IllegalStateException("Client is null!") ;
+		}
+		if (orgId == null) {
+			throw new IllegalArgumentException("Org ID is null") ;
+		}
+
+		Map<String, Object> param = new HashMap<>() ;
+		param.put("id", orgId) ;
+		try {
+			String response = client.makeRequest("/deleteFund", param) ;
+
+			if (response == null) {
+				throw new IllegalStateException("WebClient response is null");
+			}
+
+			JSONParser parser = new JSONParser();
+			JSONObject json = (JSONObject) parser.parse(response);
+			String status = (String)json.get("status");
+
+			if (!status.equals("success")) {
+				throw new IllegalStateException("WebClient respond with invalid status!");
+			}
+		} catch (Exception e) {
+			throw new IllegalStateException("Error while communicating with the server", e);
+		}
+		return ;
+	}
+
+	/**
 	 * This method creates a new fund in the database using the /createFund endpoint in the API
 	 * @return a new Fund object if successful; null if unsuccessful
 	 */
@@ -212,7 +247,6 @@ public class DataManager {
 
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			// Task 2.2: Throw exception rather than returning null
 			throw new IllegalStateException("Error while communicating with the server", e);
 			//return null;
