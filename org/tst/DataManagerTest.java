@@ -192,12 +192,12 @@ public class DataManagerTest {
         assertEquals("2024-06-07", donation.getDate());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testUnsuccessfulLogin() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override
             public String makeRequest(String resource, Map<String, Object> queryParams) {
-                return "{\"status\":\"error\"}";
+                return "{\"status\":\"login failed\"}";
             }
         });
 

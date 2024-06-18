@@ -16,7 +16,7 @@ public class UserInterface {
         this.org = org;
     }
 
-    public void start() {
+    public boolean start() {
 
         while (true) {
             System.out.println("\n\n");
@@ -33,6 +33,8 @@ public class UserInterface {
                 System.out.println("Enter the fund number to see more information.");
             }
             System.out.println("Enter 0 to create a new fund");
+            // task 2.8
+            System.out.println("Enter 'log' to logout") ;
 
             System.out.println("Enter 'q' or 'quit' to exit.");
 
@@ -40,7 +42,11 @@ public class UserInterface {
 
             if (inputString.equals("quit") || inputString.equals("q")) {
                 System.out.println("Good bye!");
-                break;
+                return false ;
+            }
+            if (inputString.equals("log")) {
+                System.out.println("Logged out") ;
+                return true ;
             }
 
             try {
@@ -218,34 +224,55 @@ public class UserInterface {
         String password = args[1];
         System.out.println("Login and Password: "+login + " " + password);
         Organization org = null;
-        
-        // Task 2.2: Retry operation
-        while (true) {
-            try {
-                org = ds.attemptLogin(login, password);
-                break;
-            } catch (IllegalStateException e) {
-                System.out.println("Error message: " + e.getMessage());
-                System.out.println("Want to retry? (Enter Y/y for Yes, or anything else for No)");
-                Scanner scanner = new Scanner(System.in);
-                String userRsp = scanner.nextLine().trim().toLowerCase();
-                
-                if (!userRsp.equals("y")) {
-                    return;
-                }
-                
-            } catch (Exception e) {
-                System.out.println("Error unexpected: " + e.getMessage());
-                return;
-            }
-        }
-        
+        Scanner scanner = new Scanner(System.in);
+        boolean haveCredentials = true ;
+        boolean exitStatus ; // exit status from either quit (false) or logout (true)
 
-        if (org == null) {
-            System.out.println("Login failed.");
-        } else {
-            UserInterface ui = new UserInterface(ds, org);
-            ui.start();
+        while(true) { // loop provides login option
+            if (haveCredentials)  {
+                // Task 2.2: Retry operation
+                while (true) {
+                    try {
+                        org = ds.attemptLogin(login, password);
+                        break;
+                    } catch (IllegalStateException e) {
+                        System.out.println("Error message: " + e.getMessage());
+                        System.out.println("Want to retry? (Enter Y/y for Yes, or anything else for No)");
+                        String userRsp = scanner.nextLine().trim().toLowerCase();
+
+                        if (!userRsp.equals("y")) {
+                            return;
+                        }
+
+                    } catch (Exception e) {
+                        System.out.println("Error unexpected: " + e.getMessage());
+                        return;
+                    }
+                }
+                if (org == null) {
+                    System.out.println("Login failed. (Y/y) to Enter New Credentials, (N/n) to exit");
+                    String userRsp = scanner.nextLine().trim().toLowerCase() ;
+                    if (userRsp.equals("n")) {
+                        System.out.println("Goodbye!") ;
+                        return ;
+                    }
+                } else {
+                    UserInterface ui = new UserInterface(ds, org);
+                    exitStatus = ui.start();
+                    if (!exitStatus) { // false => quit
+                        return ;
+                    }
+                }
+                haveCredentials = false ;
+            } else {
+                System.out.println("--------------------------------") ;
+                System.out.println("Log in to Organization") ;
+                System.out.println("Enter login:") ;
+                login = scanner.nextLine().trim() ;
+                System.out.println("Enter password:") ;
+                password = scanner.nextLine().trim() ;
+                haveCredentials = true ;
+            }
         }
     }
     

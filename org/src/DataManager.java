@@ -91,6 +91,8 @@ public class DataManager {
 				}
 
 				return org;
+			} else if (status.equals("login failed")) {
+				return null ;
 			}
 			// Task 2.2: Throw exception rather than returning null
 			else {
