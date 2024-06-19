@@ -290,28 +290,24 @@ public class UserInterface {
         // Task 2.8: Exit status from either quit (false) or logout (true)
         boolean exitStatus ; 
         
-        // Task 2.8 & 2.2: Loop provides login & retry option
+        // Task 2.8 & 2.2: Loop provides login & retry login option
         while(true) { 
         	
         	// Task 2.8: Check if credentials are known
             if (haveCredentials)  {
             	
-                // Task 2.2: Retry operation for login
-                while (true) {
-                    try {
-                        org = ds.attemptLogin(login, password);
-                        break;
-                    }
-                    catch (Exception e) {
-                    	System.out.println("Error message: " + e.getMessage());
-                        System.out.println("Want to retry? (Enter Y/y for Yes, or anything else for No)");
-                        String userRsp = scanner.nextLine().trim().toLowerCase();
+            	try {
+            		org = ds.attemptLogin(login, password);
+            	}
+            	catch (Exception e) {
+            		System.out.println("Error message: " + e.getMessage());
+            		System.out.println("Want to retry login? (Enter Y/y for Yes, or anything else for No)");
+            		String userRsp = scanner.nextLine().trim().toLowerCase();
 
-                        if (!userRsp.equals("y")) {
-                            return;
-                        }
-                    }
-                }
+            		if (!userRsp.equals("y")) {
+            			return;
+            		}
+            	}
                 
                 if (org == null) {
                     System.out.println("Login failed. (Y/y) to Enter New Credentials, or anything else to exit");
