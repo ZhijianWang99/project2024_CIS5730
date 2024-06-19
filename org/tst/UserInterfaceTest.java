@@ -24,6 +24,7 @@ public class UserInterfaceTest {
     }
 
     private void provideInput(String data) {
+        System.setIn(System.in);
         testIn = new ByteArrayInputStream(data.getBytes());
         System.setIn(testIn);
     }
@@ -130,6 +131,54 @@ public class UserInterfaceTest {
         assertEquals("--/--/----",
                 UserInterface.formatDate(new Donation("69",
                         "funk", 69, null)));
+    }
+
+    @Test
+    public void testListContributions() {
+        // Mocked data
+        List<Donation> donations1 = Arrays.asList(
+                new Donation("1","Donor1", 500,"2020-05-20T04:20:05.200Z"),
+                new Donation("2","Donor2", 1000,"2021-01-10T02:10:01.100Z")
+        );
+
+        Fund testFund1 = new Fund("Fund1Id", "Fund1", "description",2000) {
+            @Override
+            public List<Donation> getDonations() {
+                return donations1;
+            }
+        };
+
+        List<Donation> donations2 = Arrays.asList(
+                new Donation("3","Donor3", 200,"2021-02-10T12:15:02.150Z"),
+                new Donation("4","Donor4", 400,"2019-08-20T07:25:07.250Z")
+        );
+
+        Fund testFund2 = new Fund("Fund2Id", "Fund2", "description",3000) {
+            @Override
+            public List<Donation> getDonations() {
+                return donations2;
+            }
+        };
+
+        Organization testOrg = new Organization("TestId", "TestName", "TestDescription") {
+            @Override
+            public List<Fund> getFunds() {
+                return Arrays.asList(testFund1, testFund2);
+            }
+        };
+        provideInput("\n");
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        UserInterface ui = new UserInterface(new DataManager(new WebClient("testHost", 30001)), testOrg);
+
+        ui.listContributions();
+
+        // Assertions to verify it prints all the donations sorted by date descending
+        String consoleOutput = out.toString();
+        assertTrue(consoleOutput.contains("Fund Name: Fund1, Contributor Name: Donor2, Donation Amount: $1000, Donation Date: 2021-01-10T02:10:01.100Z"));
+        assertTrue(consoleOutput.contains("Fund Name: Fund2, Contributor Name: Donor3, Donation Amount: $200, Donation Date: 2021-02-10T12:15:02.150Z"));
+        assertTrue(consoleOutput.contains("Fund Name: Fund1, Contributor Name: Donor1, Donation Amount: $500, Donation Date: 2020-05-20T04:20:05.200Z"));
+        assertTrue(consoleOutput.contains("Fund Name: Fund2, Contributor Name: Donor4, Donation Amount: $400, Donation Date: 2019-08-20T07:25:07.250Z"));
     }
 
     @Test

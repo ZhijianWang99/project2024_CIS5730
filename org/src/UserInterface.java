@@ -251,7 +251,9 @@ public class UserInterface {
         Map<String, String> Id2NameMap = new HashMap<>();
         for (Fund fund : org.getFunds()) {
             allDonations.addAll(fund.getDonations());
-            Id2NameMap.put(fund.getId(), fund.getName());
+            for (Donation d: fund.getDonations()){
+                Id2NameMap.put(d.getFundId(), fund.getName());
+            }
         }
 
         // Sort donations in descending order by date 
