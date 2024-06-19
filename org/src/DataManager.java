@@ -123,7 +123,8 @@ public class DataManager {
 		
 		// Task 2.1: Check with the cache first
         if (contributorDataCache.containsKey(id)) {
-        	String outputCache=contributorDataCache.get(id);System.out.println("<Trivial> Cache found: "+outputCache);
+        	String outputCache=contributorDataCache.get(id);
+			System.out.println("<Trivial> Cache found: "+outputCache);
             return outputCache;
         }
 
@@ -258,5 +259,7 @@ public class DataManager {
 		}	
 	}
 
-
+	public Map<String, String> getContributorDataCache() {
+		return contributorDataCache;
+	}
 }
