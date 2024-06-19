@@ -19,6 +19,7 @@ Task 2.7 (Steven Shi) : A deleteFund method with defensive programming is implem
           In addition, tests for deleteFund are created in DataManagerRobustnessTest and DataManagerTest
 
 Task 2.8 (Steven Shi) : UserInterface class has been modified to enable logout and re-login without restarting the app, and all the related modifications are labeled with "// Task 2.8"
+        Fixed small bug in attemptLogin throwing exceptions upon unsuccessful logins
 
 Task 2.9 (Zhijian Wang) : In UserInterface class, a listContributions method is implemented to enable showing all the contributions and some other modifications are also made (e.g. in start method), and all the related modifications are labeled with "// Task 2.9"
 
