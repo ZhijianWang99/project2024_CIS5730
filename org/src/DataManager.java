@@ -91,6 +91,8 @@ public class DataManager {
 				}
 
 				return org;
+			} else if (status.equals("login failed")) {
+				return null ;
 			}
 			// Task 2.2: Throw exception rather than returning null
 			else {
@@ -119,7 +121,7 @@ public class DataManager {
             throw new IllegalArgumentException("ID is null!");
         }
 		
-		// Task 21: Check with the cache first
+		// Task 2.1: Check with the cache first
         if (contributorDataCache.containsKey(id)) {
         	String outputCache=contributorDataCache.get(id);System.out.println("<Trivial> Cache found: "+outputCache);
             return outputCache;
@@ -142,9 +144,11 @@ public class DataManager {
 
 			if (status.equals("success")) {
 				String name = (String)json.get("data");
+				
 				// Task 2.1: Add contributor name to cache
 				contributorDataCache.put(id, name);System.out.println("<Trivial> Cache add name: "+name);
 				return name;
+				
 			}
 			// Task 2.2: Throw exception rather than returning null
 			else {
@@ -159,6 +163,42 @@ public class DataManager {
 			throw new IllegalStateException("Error while communicating with the server", e);
 			//return null;
 		}	
+	}
+
+	/**
+	 * For Task 2.7
+	 * This method requests to delete a fund using the /deleteFund endpoint the API
+	 * @param orgId - String for organization ID to be deleted
+	 * @return void
+	 */
+	public void deleteFund(String orgId) {
+		if (client == null) {
+			throw new IllegalStateException("Client is null!") ;
+		}
+		if (orgId == null) {
+			throw new IllegalArgumentException("Org ID is null") ;
+		}
+
+		Map<String, Object> param = new HashMap<>() ;
+		param.put("id", orgId) ;
+		try {
+			String response = client.makeRequest("/deleteFund", param) ;
+
+			if (response == null) {
+				throw new IllegalStateException("WebClient response is null");
+			}
+
+			JSONParser parser = new JSONParser();
+			JSONObject json = (JSONObject) parser.parse(response);
+			String status = (String)json.get("status");
+
+			if (!status.equals("success")) {
+				throw new IllegalStateException("WebClient respond with invalid status!");
+			}
+		} catch (Exception e) {
+			throw new IllegalStateException("Error while communicating with the server", e);
+		}
+		return ;
 	}
 
 	/**
@@ -212,7 +252,6 @@ public class DataManager {
 
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			// Task 2.2: Throw exception rather than returning null
 			throw new IllegalStateException("Error while communicating with the server", e);
 			//return null;
