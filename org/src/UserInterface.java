@@ -14,67 +14,112 @@ public class UserInterface {
     public UserInterface(DataManager dataManager, Organization org) {
         this.dataManager = dataManager;
         this.org = org;
-    }
-
+    }   
+    
     public boolean start() {
+        Scanner scanner = new Scanner(System.in);
+        boolean haveCredentials = org != null;
+        boolean exitStatus;
 
         while (true) {
-            System.out.println("\n\n");
-            if (org.getFunds().size() > 0) {
-                System.out.println("There are " + org.getFunds().size() + " funds in this organization:");
+            if (haveCredentials) {
+                while (true) {
+                    System.out.println("\n\n");
+                    if (org.getFunds().size() > 0) {
+                        System.out.println("There are " + org.getFunds().size() + " funds in this organization:");
 
-                int count = 1;
-                for (Fund f : org.getFunds()) {
+                        int count = 1;
+                        for (Fund f : org.getFunds()) {
+                            System.out.println(count + ": " + f.getName());
+                            count++;
+                        }
+                        System.out.println("Enter the fund number to see more information.");
+                    }
+                    // Task 3.2: Option to change password
+                    System.out.println("Enter 'c' to change the organization's password");
+                    System.out.println("Enter 0 to create a new fund");
+                    System.out.println("Enter 'l' to list all the contributions");
+                    System.out.println("Enter 'logout' to logout");
+                    System.out.println("Enter 'q' or 'quit' to exit.");
 
-                    System.out.println(count + ": " + f.getName());
+                    String inputString = in.nextLine();
 
-                    count++;
+                    if (inputString.equals("quit") || inputString.equals("q")) {
+                        System.out.println("Good bye!");
+                        return false;
+                    }
+                    if (inputString.equals("logout")) {
+                        System.out.println("Logged out");
+                        return true;
+                    }
+                    // Enter 'l' to list all the contributions
+                    if (inputString.equals("l")) {
+                        listContributions();
+                    } 
+                    // Task 3.2: Enter 'c' to change password
+                    else if (inputString.equals("c")) {
+                        changePassword();
+                    }
+                    else {
+                        try {
+                            int option = Integer.parseInt(inputString);
+
+                            if (option == 0) {
+                                createFund();
+                            } else if (option > 0 && option - 1 < org.getFunds().size()) {
+                                displayFund(option);
+                            } else {
+                                System.out.println("Invalid fund number! Please enter a valid fund number or 0 to create a new fund, or enter 'q' or 'quit' to exit. There are " + String.valueOf(org.getFunds().size()) + " funds now.");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input! Please enter a valid input, or 'q' or 'quit' to exit.");
+                        }
+                    }
                 }
-                System.out.println("Enter the fund number to see more information.");
-            }
-            System.out.println("Enter 0 to create a new fund");
-            
-            System.out.println("Enter -1 to list all the contributions");
-            
-            // Task 2.8: Log out option
-            System.out.println("Enter 'logout' to logout");
-
-            System.out.println("Enter 'q' or 'quit' to exit.");
-
-            String inputString = in.nextLine();
-
-            if (inputString.equals("quit") || inputString.equals("q")) {
-                System.out.println("Good bye!");
-                return false ;
-            }
-            if (inputString.equals("logout")) {
-                System.out.println("Logged out") ;
-                return true ;
-            }
-
-            try {
-
-                int option = Integer.parseInt(inputString);
-
-                if (option == 0) {
-                    createFund();
-                } 
-                // Task 2.9 for listing all contributions
-                else if (option == -1) { 
-                	listContributions();
-                } 
-                else if (option > 0 && option - 1 < org.getFunds().size()) {
-                    displayFund(option);
-                } 
-                else {
-                    System.out.println("Invalid fund number! Please enter a valid fund number or 0 to create a new fund, or enter 'q' or 'quit' to exit. There are " + String.valueOf(org.getFunds().size()) + " funds now.");
+            } else {
+                System.out.println("--------------------------------");
+                System.out.println("Log in to Organization or Register a New Organization");
+                System.out.println("Enter 'q' or 'quit' to exit, 'r' to register a new organization, and anything else to continue login");
+                String respStr = scanner.nextLine();
+                if (respStr.equals("quit") || respStr.equals("q")) {
+                    System.out.println("Good bye!");
+                    return false;
                 }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input! Please enter a valid fund number, 0 to create a new fund, or 'q' or 'quit' to exit.");
+                
+                // Task 3.1: Register and create a new organization
+                if (respStr.equals("r")) {
+                    registerNewOrganization();
+                } else {
+                    System.out.println("Enter login:");
+                    String login = scanner.nextLine();
+                    System.out.println("Enter password:");
+                    String password = scanner.nextLine();
+                    try {
+                        org = dataManager.attemptLogin(login, password);
+                        if (org == null) {
+                            System.out.println("Login failed. (Y/y) to Enter New Credentials, 'r' to Register, or anything else to exit");
+                            String userRsp = scanner.nextLine().trim().toLowerCase();
+                            if (userRsp.equals("r")) {
+                                registerNewOrganization();
+                            } else if (!userRsp.equals("y")) {
+                                System.out.println("Goodbye!");
+                                return false;
+                            }
+                        } else {
+                            System.out.println("Login succeed.");
+                            haveCredentials = true;
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Error message: " + e.getMessage());
+                        System.out.println("Want to retry login? (Enter Y/y for Yes, or anything else for No)");
+                        String userRsp = scanner.nextLine().trim().toLowerCase();
+                        if (!userRsp.equals("y")) {
+                            return false;
+                        }
+                    }
+                }
             }
-
         }
-
     }
 
     
@@ -148,6 +193,107 @@ public class UserInterface {
 
     	}
         
+    }
+    
+    
+    
+    /*
+     * Task 3.1
+     * Method to register and create a new organization
+     */
+    private void registerNewOrganization() {
+        Scanner scanner = new Scanner(System.in);
+
+        String login;
+        
+        while (true) {
+            System.out.println("Enter login name: ");
+            login = scanner.nextLine().trim();
+            if (!login.isEmpty()) {
+                break;
+            }
+            System.out.println("Login name cannot be blank. Please enter again.");
+        }
+
+        String password;
+        
+        while (true) {
+            System.out.println("Enter password: ");
+            password = scanner.nextLine().trim();
+            if (!password.isEmpty()) {
+                break;
+            }
+            System.out.println("Password cannot be blank. Please enter again.");
+        }
+
+        String name;
+        while (true) {
+            System.out.println("Enter organization name: ");
+            name = scanner.nextLine().trim();
+            if (!name.isEmpty()) {
+                break;
+            }
+            System.out.println("Organization name cannot be blank. Please enter again.");
+        }
+
+        String description;
+        while (true) {
+            System.out.println("Enter organization description: ");
+            description = scanner.nextLine().trim();
+            if (!description.isEmpty()) {
+                break;
+            }
+            System.out.println("Organization description cannot be blank. Please enter again.");
+        }
+
+        try {
+            Organization newOrg = dataManager.createOrganization(login, password, name, description);
+            if (newOrg != null) {
+                System.out.println("Organization created successfully. Please log in using the new credentials.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            System.out.println("Want to retry registering? (Enter Y/y for Yes, or anything else for No)");
+            String userRsp = scanner.nextLine().trim().toLowerCase();
+            if (userRsp.equals("y")) {
+                registerNewOrganization();
+            }
+        }
+    }
+    
+    /*
+     * Task 3.2
+     * Method to change password
+     */
+    private void changePassword() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter current password:");
+        String currentPassword = scanner.nextLine();
+
+        System.out.println("Enter new password:");
+        String newPassword = scanner.nextLine();
+
+        System.out.println("Re-enter new password:");
+        String newPasswordConfirm = scanner.nextLine();
+
+        if (!newPassword.equals(newPasswordConfirm)) {
+            System.out.println("New passwords do not match! Please enter 'c' to try again.");
+            return;
+        }
+
+        try {
+            boolean success = dataManager.changePassword(org.getId(), currentPassword, newPassword);
+            if (success) {
+                System.out.println("Password changed successfully.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Password change failed!  Please enter 'c' to try again.");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            System.out.println("Password change failed!  Please enter 'c' to try again.");
+        }
     }
 
 
@@ -278,78 +424,73 @@ public class UserInterface {
         String[] dateArr = donation.getDate().split("T")[0].split("-");
         return String.format("%s/%s/%s", dateArr[1], dateArr[2], dateArr[0]);
     }
-
+    
+    
     public static void main(String[] args) {
         DataManager ds = new DataManager(new WebClient("localhost", 3001));
-        String login = args[0];
-        String password = args[1];
-        System.out.println("Argument Input Login and Password: "+login + " " + password);
-        Organization org = null;
+        String login = args.length > 0 ? args[0] : "";
+        String password = args.length > 1 ? args[1] : "";
         Scanner scanner = new Scanner(System.in);
-
-        // Task 2.8: Flag to denote if the system has login credentials
-        boolean haveCredentials = true ;
-        // Task 2.8: Exit status from either quit (false) or logout (true)
-        boolean exitStatus ; 
         
-        // Task 2.8 & 2.2: Loop provides login & retry login option
-        while(true) { 
-        	
-        	// Task 2.8: Check if credentials are known
-            if (haveCredentials)  {
-            	
-            	try {
-            		org = ds.attemptLogin(login, password);
-            	}
-            	catch (Exception e) {
-            		System.out.println("Error message: " + e.getMessage());
-            		System.out.println("Want to retry login? (Enter Y/y for Yes, or anything else for No)");
-            		String userRsp = scanner.nextLine().trim().toLowerCase();
+        Organization org = null;
 
-            		if (!userRsp.equals("y")) {
-            			return;
-            		}
-            	}
-                
-                if (org == null) {
-                    System.out.println("Login failed. (Y/y) to Enter New Credentials, or anything else to exit");
-                    String userRsp = scanner.nextLine().trim().toLowerCase() ;
+        boolean haveCredentials = (!login.isEmpty() && !password.isEmpty());
+        boolean exitStatus;
+
+        while (true) {
+            if (haveCredentials) {
+                try {
+                    org = ds.attemptLogin(login, password);
+                    if (org == null) {
+                    	// Task 3.1: Give the option to register a new organization with 'r'
+                        System.out.println("Login failed. (Y/y) to Enter New Credentials, 'r' to Register New Organization, or anything else to exit");
+                        String userRsp = scanner.nextLine().trim().toLowerCase();
+                        if (userRsp.equals("r")) {
+                            new UserInterface(ds, null).registerNewOrganization();
+                        } else if (!userRsp.equals("y")) {
+                            System.out.println("Goodbye!");
+                            return;
+                        }
+                    } else {
+                        System.out.println("Login succeed.");
+                        UserInterface ui = new UserInterface(ds, org);
+                        exitStatus = ui.start();
+                        if (!exitStatus) {
+                            return;
+                        }
+                    }
+                    haveCredentials = false;
+                } catch (Exception e) {
+                    System.out.println("Error message: " + e.getMessage());
+                    System.out.println("Want to retry login? (Enter Y/y for Yes, or anything else for No)");
+                    String userRsp = scanner.nextLine().trim().toLowerCase();
                     if (!userRsp.equals("y")) {
-                        System.out.println("Goodbye!") ;
                         return;
                     }
-                } else {
-                	System.out.println("Login succeed.");
-                    UserInterface ui = new UserInterface(ds, org);
-                    exitStatus = ui.start();
-                    
-                    // Task 2.8:false => quit
-                    if (!exitStatus) { 
-                        return;
-                    }
-                    
                 }
-                haveCredentials = false ;
-                
-            } 
-            // Task 2.8 & 2.2: Option to re-login
-            else {
-                System.out.println("--------------------------------") ;
-                System.out.println("Log in to Organization") ;
-                System.out.println("Enter 'q' or 'quit' to exit, and anything else to continue login");
+            } else {
+                System.out.println("--------------------------------");
+                System.out.println("Log in to Organization or Register a New Organization");
+                // Task 3.1: Give the option to register a new organization with 'r'
+                System.out.println("Enter 'q' or 'quit' to exit, 'r' to register a new organization, and anything else to continue login");
                 String respStr = scanner.nextLine();
                 if (respStr.equals("quit") || respStr.equals("q")) {
                     System.out.println("Good bye!");
                     return;
                 }
-                System.out.println("Enter login:") ;
-                login = scanner.nextLine();
-                System.out.println("Enter password:") ;
-                password = scanner.nextLine();
-                haveCredentials = true ;
+                if (respStr.equals("r")) {
+                    new UserInterface(ds, null).registerNewOrganization();
+                } else {
+                    System.out.println("Enter login:");
+                    login = scanner.nextLine();
+                    System.out.println("Enter password:");
+                    password = scanner.nextLine();
+                    haveCredentials = true;
+                }
             }
         }
     }
+     
     
     // Task 2.3: Define an AggregatedDonation class
     private static class AggregatedDonation {

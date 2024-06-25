@@ -123,8 +123,7 @@ public class DataManager {
 		
 		// Task 2.1: Check with the cache first
         if (contributorDataCache.containsKey(id)) {
-        	String outputCache=contributorDataCache.get(id);
-			System.out.println("<Trivial> Cache found: "+outputCache);
+        	String outputCache=contributorDataCache.get(id);System.out.println("<Trivial> Cache found: "+outputCache);
             return outputCache;
         }
 
@@ -258,8 +257,116 @@ public class DataManager {
 			//return null;
 		}	
 	}
+	
+	/**
+     * Task 3.1
+     * Method to create a new organization
+     * This method employs the /createOrg endpoint in the API
+     * @return an Organization object if successful; null if unsuccessful
+     */
+    public Organization createOrganization(String login, String password, String name, String description) {
 
-	public Map<String, String> getContributorDataCache() {
-		return contributorDataCache;
-	}
+        // Throw exception
+        if (client == null) {
+            throw new IllegalStateException("Client is null!");
+        }
+        if (login == null) {
+            throw new IllegalArgumentException("Login is null!");
+        }
+        if (password == null) {
+            throw new IllegalArgumentException("Password is null!");
+        }
+        if (name == null) {
+            throw new IllegalArgumentException("Name is null!");
+        }
+        if (description == null) {
+            throw new IllegalArgumentException("Description is null!");
+        }
+
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("login", login);
+            map.put("password", password);
+            map.put("name", name);
+            map.put("description", description);
+            String response = client.makeRequest("/createOrg", map);
+
+            // Throw exception
+            if (response == null) {
+                throw new IllegalStateException("WebClient response is null!");
+            }
+
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(response);
+            String status = (String) json.get("status");
+
+            if (status.equals("success")) {
+                JSONObject data = (JSONObject) json.get("data");
+                String orgId = (String) data.get("_id");
+                Organization org = new Organization(orgId, name, description);
+                return org;
+            } else if (status.equals("login exists")) {
+                throw new IllegalStateException("Login name already exists!");
+            } else {
+                throw new IllegalStateException("WebClient responded with an invalid status!");
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException("Error while communicating with the server", e);
+        }
+    }
+
+    /**
+     * Task 3.2
+     * Method to change password
+     * This method employs the /changePassword endpoint in the API
+     * @return true if successful
+     */
+    public boolean changePassword(String orgId, String currentPassword, String newPassword) {
+    	
+    	// Throw exception
+        if (client == null) {
+            throw new IllegalStateException("Client is null!");
+        }
+        if (orgId == null) {
+            throw new IllegalArgumentException("ID is null!");
+        }
+        if (currentPassword == null) {
+            throw new IllegalArgumentException("Current password is null!");
+        }
+        if (newPassword == null) {
+            throw new IllegalArgumentException("New password is null!");
+        }
+
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("orgId", orgId);
+            map.put("currentPassword", currentPassword);
+            map.put("newPassword", newPassword);
+
+            String response = client.makeRequest("/changePassword", map);
+
+            // Throw exception
+            if (response == null) {
+                throw new IllegalStateException("WebClient response is null!");
+            }
+
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(response);
+            String status = (String) json.get("status");
+
+            if (status.equals("success")) {
+                return true;
+            } else if (status.equals("incorrect password")) {
+                throw new IllegalArgumentException("Current password is incorrect!");
+            } else {
+                throw new IllegalStateException("WebClient responded with an invalid status!");
+            }
+            
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IllegalStateException("Error while communicating with the server", e);
+        }
+    }
+
 }

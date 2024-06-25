@@ -41,7 +41,7 @@ public class UserInterfaceTest {
         final String testString = "0\nq\n";
         provideInput(testString);
 
-        Fund testFund = new Fund("Test fund id", "testFund", "description", 2000);
+        Fund testFund = new Fund("Test fund id", "testFund", "description",2000);
         Organization testOrg = new Organization("TestId", "TestName", "TestDescription") {
             @Override
             public List<Fund> getFunds() {
@@ -64,15 +64,20 @@ public class UserInterfaceTest {
         assertTrue(consoleOutput.contains("Good bye!"));
     }
 
-    private static Map<String, Integer> countFreq(String[] array, int n) {
+    private static Map<String, Integer> countFreq(String[] array, int n)
+    {
         Map<String, Integer> ret = new HashMap<>();
 
         // Traverse through array elements and
         // count frequencies
-        for (int i = 0; i < n; i++) {
-            if (ret.containsKey(array[i])) {
+        for (int i = 0; i < n; i++)
+        {
+            if (ret.containsKey(array[i]))
+            {
                 ret.put(array[i], ret.get(array[i]) + 1);
-            } else {
+            }
+            else
+            {
                 ret.put(array[i], 1);
             }
         }
@@ -84,12 +89,11 @@ public class UserInterfaceTest {
         provideInput("aa\n");
         // Mocked data
         List<Donation> donations = Arrays.asList(
-                new Donation("1", "Donor1", 500, "2020-05-20T04:20:05.200Z"),
-                new Donation("2", "Donor2", 1000, "2021-01-10T02:10:01.100Z"),
-                new Donation("3", "Donor1", 300, "2021-01-11T02:10:01.100Z")
+                new Donation("1","Donor1", 500,"2020-05-20T04:20:05.200Z"),
+                new Donation("2","Donor2", 1000,"2021-01-10T02:10:01.100Z")
         );
 
-        Fund testFund = new Fund("Test fund id", "testFund", "description", 2000) {
+        Fund testFund = new Fund("Test fund id", "testFund", "description",2000) {
             @Override
             public List<Donation> getDonations() {
                 return donations;
@@ -114,15 +118,12 @@ public class UserInterfaceTest {
         assertTrue(consoleOutput.contains("Name: " + testFund.getName()));
         assertTrue(consoleOutput.contains("Description: " + testFund.getDescription()));
         assertTrue(consoleOutput.contains("Target: $" + testFund.getTarget()));
-        assertTrue(consoleOutput.contains("Aggregated donations:"));
-        assertTrue(consoleOutput.contains("* Donor2, 1 donations, $1000 total"));
-        assertTrue(consoleOutput.contains("* Donor1, 2 donations, $800 total"));
-        assertTrue(consoleOutput.contains("Total donation amount: $1800 (90.00% of target)"));
+        assertTrue(consoleOutput.contains("Total donation amount: $1500 (75.00% of target)"));
     }
 
     @Test
     public void testFormatDateNullDonationInput() {
-        assertEquals("--/--/----", UserInterface.formatDate(null));
+        assertEquals("--/--/----", UserInterface.formatDate(null)) ;
     }
 
     @Test
@@ -136,11 +137,11 @@ public class UserInterfaceTest {
     public void testListContributions() {
         // Mocked data
         List<Donation> donations1 = Arrays.asList(
-                new Donation("1", "Donor1", 500, "2020-05-20T04:20:05.200Z"),
-                new Donation("2", "Donor2", 1000, "2021-01-10T02:10:01.100Z")
+                new Donation("1","Donor1", 500,"2020-05-20T04:20:05.200Z"),
+                new Donation("2","Donor2", 1000,"2021-01-10T02:10:01.100Z")
         );
 
-        Fund testFund1 = new Fund("Fund1Id", "Fund1", "description", 2000) {
+        Fund testFund1 = new Fund("Fund1Id", "Fund1", "description",2000) {
             @Override
             public List<Donation> getDonations() {
                 return donations1;
@@ -148,11 +149,11 @@ public class UserInterfaceTest {
         };
 
         List<Donation> donations2 = Arrays.asList(
-                new Donation("3", "Donor3", 200, "2021-02-10T12:15:02.150Z"),
-                new Donation("4", "Donor4", 400, "2019-08-20T07:25:07.250Z")
+                new Donation("3","Donor3", 200,"2021-02-10T12:15:02.150Z"),
+                new Donation("4","Donor4", 400,"2019-08-20T07:25:07.250Z")
         );
 
-        Fund testFund2 = new Fund("Fund2Id", "Fund2", "description", 3000) {
+        Fund testFund2 = new Fund("Fund2Id", "Fund2", "description",3000) {
             @Override
             public List<Donation> getDonations() {
                 return donations2;

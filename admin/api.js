@@ -6,7 +6,6 @@ const {Fund} = require('./DbConfig.js');
 const {Contributor} = require('./DbConfig.js');
 const {Donation} = require('./DbConfig.js');
 
-
 /*
 Return an org with login specified as req.query.login and password specified as 
 req.query.password; this essentially acts as login for organizations
@@ -359,6 +358,62 @@ app.use('/allOrgs', (req, res) => {
     });
 
 
+
+
+
+/*
+Create a new organization
+*/
+app.use('/createOrg', (req, res) => {
+    var query = { "login": req.query.login };
+    Organization.findOne(query, (err, result) => {
+        if (err) {
+            res.json({ "status": "find one error", "data": err });
+        } else if (result) {
+            res.json({ "status": "login exists" });
+        } else {
+            var org = new Organization({
+                login: req.query.login,
+                password: req.query.password,
+                name: req.query.name,
+                description: req.query.description,
+                funds: []
+            });
+
+            org.save((err) => {
+                if (err) {
+                    res.json({ "status": "save error", "data": err });
+                } else {
+                    res.json({ "status": "success", "data": org });
+                }
+            });
+        }
+    });
+});
+
+
+/*
+Change password
+*/
+app.use('/changePassword', (req, res) => {
+    var query = { "_id": req.query.orgId, "password": req.query.currentPassword };
+    Organization.findOne(query, (err, org) => {
+        if (err) {
+            return res.json({ "status": "error", "data": err });
+        } else if (!org) {
+            return res.json({ "status": "incorrect password" });
+        } else {
+            org.password = req.query.newPassword;
+            org.save((err) => {
+                if (err) {
+                    return res.json({ "status": "save error", "data": err });
+                } else {
+                    return res.json({ "status": "success", "data": org });
+                }
+            });
+        }
+    });
+});
 
 /********************************************************/
 
