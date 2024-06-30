@@ -143,4 +143,18 @@ public class DataManager_createOrganization_Test {
         DataManager dataManager = new DataManager(client);
         dataManager.createOrganization("newlogin", "password", "name1", "description1");
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void testCreateOrganizationInvalidStatus() {
+        DataManager dm = new DataManager(new WebClient("localhost", 3001) {
+            @Override
+            public String makeRequest(String resource, Map<String, Object> queryParams) {
+                if (resource.equals("/createOrg")) {
+                    return "{\"status\":\"some invalid status\"}";
+                }
+                return null;
+            }
+        });
+        dm.createOrganization("login1", "password1", "name1", "description1");
+    }
 }

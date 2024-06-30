@@ -418,7 +418,12 @@ public class DataManager {
             throw new IllegalStateException("Error while communicating with the server", e);
         }
     }
-
+	/**
+	 * Task 3.3
+	 * Method to edit the name or description
+	 * This method employs the /editAccount endpoint in the API
+	 * @return true if successful
+	 */
 	public boolean editAccountInfo(String id, String newName, String newDescription) {
 
 		// Throw exception

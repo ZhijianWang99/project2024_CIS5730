@@ -10,4 +10,7 @@ Task 3.1 (Lei Sun) : A new method createOrganization() is added to the DataManag
 Task 3.2 (Lei Sun) : A new method changePassword() is added to the DataManager class, a new method changePassword() is added to the UserInterface class, and a new function "app.use('/changePassword', (req, res)" is added to api.js. Other changes in the main() and start() method of the UserInterface class are all labeled with "// Task 3.2";
           All the test cases w.r.t. the changePassword() method in the DataManager class are provided in DataManager_changePassword_Test.java
 
+Task 3.3 (Zhijian Wang) : A new method editAccountInfo() is added to the DataManager class, a new method editAccountInfo(cachedLogin) is added to the UserInterface class, and a new function "app.use('/editAccount', (req, res)" is added to api.js. Other changes in the main() and start() method of the UserInterface class are all labeled with "// Task 3.4";
+All the test cases w.r.t. the editAccountInfo() method in the DataManager class are provided in DataManager_editAccountInfo_Test.java
+
 
