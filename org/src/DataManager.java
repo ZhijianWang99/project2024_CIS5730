@@ -369,4 +369,43 @@ public class DataManager {
         }
     }
 
+	public boolean editAccountInfo(String id, String newName, String newDescription) {
+
+		// Throw exception
+		if (client == null) {
+			throw new IllegalStateException("Client is null!");
+		}
+		if (id == null) {
+			throw new IllegalArgumentException("ID is null!");
+		}
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("id", id);
+			if (newName != null) {
+				map.put("name", newName);
+			}
+			if (newDescription != null) {
+				map.put("description", newDescription);
+			}
+			String response = client.makeRequest("/editAccount", map);
+			// Throw exception
+			if (response == null) {
+				throw new IllegalStateException("WebClient response is null!");
+			}
+
+			JSONParser parser = new JSONParser();
+			JSONObject json = (JSONObject) parser.parse(response);
+			String status = (String) json.get("status");
+			System.out.println(status);
+			if (status.equals("success")) {
+				return true;
+			} else {
+				throw new IllegalStateException("WebClient responded with an invalid status!");
+			}
+		} catch (Exception e) {
+			throw new IllegalStateException("Error while communicating with the server", e);
+		}
+	}
+
+
 }

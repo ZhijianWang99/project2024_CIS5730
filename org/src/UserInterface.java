@@ -7,20 +7,20 @@ public class UserInterface {
     private DataManager dataManager;
     private Organization org;
     private Scanner in = new Scanner(System.in);
-    
+
+    private String cachedLogin;
     // Task 2.3
     private Map<String, Map<String, AggregatedDonation>> aggregatedDonationsCache = new HashMap<>();
 
     public UserInterface(DataManager dataManager, Organization org) {
         this.dataManager = dataManager;
         this.org = org;
-    }   
-    
+    }
+
     public boolean start() {
         Scanner scanner = new Scanner(System.in);
         boolean haveCredentials = org != null;
         boolean exitStatus;
-
         while (true) {
             if (haveCredentials) {
                 while (true) {
@@ -36,11 +36,14 @@ public class UserInterface {
                         System.out.println("Enter the fund number to see more information.");
                     }
                     // Task 3.2: Option to change password
+                    // Task 3.3
                     System.out.println("Enter 'c' to change the organization's password");
                     System.out.println("Enter 0 to create a new fund");
                     System.out.println("Enter 'l' to list all the contributions");
+                    System.out.println("Enter 'e' to edit the organization name or description");
                     System.out.println("Enter 'logout' to logout");
                     System.out.println("Enter 'q' or 'quit' to exit.");
+
 
                     String inputString = in.nextLine();
 
@@ -55,12 +58,14 @@ public class UserInterface {
                     // Enter 'l' to list all the contributions
                     if (inputString.equals("l")) {
                         listContributions();
-                    } 
+                    }
                     // Task 3.2: Enter 'c' to change password
                     else if (inputString.equals("c")) {
                         changePassword();
                     }
-                    else {
+                    else if (inputString.equals("e")) {
+                        editAccountInfo(cachedLogin);
+                    } else {
                         try {
                             int option = Integer.parseInt(inputString);
 
@@ -85,7 +90,7 @@ public class UserInterface {
                     System.out.println("Good bye!");
                     return false;
                 }
-                
+
                 // Task 3.1: Register and create a new organization
                 if (respStr.equals("r")) {
                     registerNewOrganization();
@@ -122,81 +127,80 @@ public class UserInterface {
         }
     }
 
-    
+
     public void createFund() {
-    	
-    	// Task 2.2: Retry operation for createFund
-    	while (true) {
 
-    		Scanner scanner = new Scanner(System.in);
+        // Task 2.2: Retry operation for createFund
+        while (true) {
 
-    		// Getting the name with validation
-    		String fundName;
-    		while (true) {
-    			System.out.println("Enter fund name: ");
-    			fundName = scanner.nextLine().trim();
-    			if (!fundName.isEmpty()) {
-    				break;
-    			}
-    			System.out.println("Fund name cannot be blank. Please enter again.");
-    		}
+            Scanner scanner = new Scanner(System.in);
 
-    		// Getting the description with validation
-    		String fundDescription;
-    		while (true) {
-    			System.out.println("Enter fund description: ");
-    			fundDescription = scanner.nextLine().trim();
-    			if (!fundDescription.isEmpty()) {
-    				break;
-    			}
-    			System.out.println("Fund description cannot be blank. Please enter again.");
-    		}
+            // Getting the name with validation
+            String fundName;
+            while (true) {
+                System.out.println("Enter fund name: ");
+                fundName = scanner.nextLine().trim();
+                if (!fundName.isEmpty()) {
+                    break;
+                }
+                System.out.println("Fund name cannot be blank. Please enter again.");
+            }
 
-    		// Getting the target with validation
-    		Long fundTarget;
-    		while (true) {
-    			System.out.println("Enter fund target: ");
-    			try {
-    				fundTarget = Long.parseLong(scanner.nextLine().trim());
-    				if (fundTarget < 0) {
-    					System.out.println("Fund target cannot be negative. Please enter again.");
-    				} else {
-    					break;
-    				}
-    			} catch (NumberFormatException e) {
-    				System.out.println("Fund target needs to be a integer number. Please enter again.");
-    			}
-    		}
+            // Getting the description with validation
+            String fundDescription;
+            while (true) {
+                System.out.println("Enter fund description: ");
+                fundDescription = scanner.nextLine().trim();
+                if (!fundDescription.isEmpty()) {
+                    break;
+                }
+                System.out.println("Fund description cannot be blank. Please enter again.");
+            }
 
-    		try {
+            // Getting the target with validation
+            Long fundTarget;
+            while (true) {
+                System.out.println("Enter fund target: ");
+                try {
+                    fundTarget = Long.parseLong(scanner.nextLine().trim());
+                    if (fundTarget < 0) {
+                        System.out.println("Fund target cannot be negative. Please enter again.");
+                    } else {
+                        break;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Fund target needs to be a integer number. Please enter again.");
+                }
+            }
 
-    			Fund newFund = dataManager.createFund(org.getId(), fundName, fundDescription, fundTarget);
+            try {
 
-    			if (newFund != null) {
-    				org.addFund(newFund);
-    				System.out.println("Fund created successfully");
-    			} else {
-    				System.out.println("Failed to create the fund since is is null!");
-    			}
-    			break;
-    			
-    		} catch (Exception e) {
-    			// Task 2.2: Prompt for user during retry
-    			System.out.println("Error message: " + e.getMessage());
-    			System.out.println("Want to retry creating fund? (Enter Y/y for Yes, or anything else for No)");
-    			String userRsp = scanner.nextLine().trim().toLowerCase();
+                Fund newFund = dataManager.createFund(org.getId(), fundName, fundDescription, fundTarget);
 
-    			if (!userRsp.equals("y")) {
-    				break;
-    			}
-    		}
+                if (newFund != null) {
+                    org.addFund(newFund);
+                    System.out.println("Fund created successfully");
+                } else {
+                    System.out.println("Failed to create the fund since is is null!");
+                }
+                break;
 
-    	}
-        
+            } catch (Exception e) {
+                // Task 2.2: Prompt for user during retry
+                System.out.println("Error message: " + e.getMessage());
+                System.out.println("Want to retry creating fund? (Enter Y/y for Yes, or anything else for No)");
+                String userRsp = scanner.nextLine().trim().toLowerCase();
+
+                if (!userRsp.equals("y")) {
+                    break;
+                }
+            }
+
+        }
+
     }
-    
-    
-    
+
+
     /*
      * Task 3.1
      * Method to register and create a new organization
@@ -205,7 +209,6 @@ public class UserInterface {
         Scanner scanner = new Scanner(System.in);
 
         String login;
-        
         while (true) {
             System.out.println("Enter login name: ");
             login = scanner.nextLine().trim();
@@ -216,7 +219,7 @@ public class UserInterface {
         }
 
         String password;
-        
+
         while (true) {
             System.out.println("Enter password: ");
             password = scanner.nextLine().trim();
@@ -260,7 +263,7 @@ public class UserInterface {
             }
         }
     }
-    
+
     /*
      * Task 3.2
      * Method to change password
@@ -296,6 +299,56 @@ public class UserInterface {
         }
     }
 
+    /*
+     * Task 3.2
+     * Method to change password
+     */
+    private void editAccountInfo(String login) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter your password:");
+        String password = scanner.nextLine();
+        try {
+            Organization tempOrg = dataManager.attemptLogin(login, password);
+            System.out.println(login);
+            System.out.println(password);
+            if (tempOrg == null) {
+                System.out.println("Password is wrong, go back to the previous menu.");
+            } else {
+                String newName = null;
+                System.out.println("Edit name? (Enter T/F)");
+                String option = scanner.nextLine().toUpperCase();
+                while (!option.equals("T") && !option.equals("F")) {
+                    System.out.println("Edit name? (Enter T/F)");
+                    option = scanner.nextLine().toUpperCase().strip();
+                }
+                if (option.equals("T")) {
+                    System.out.println("Enter new name:");
+                    newName = scanner.nextLine();
+                }
+
+                String newDescription = null;
+                System.out.println("Edit Description? (Enter T/F)");
+                option = scanner.nextLine().toUpperCase().strip();
+                while (!option.equals("T") && !option.equals("F")) {
+                    System.out.println("Edit Description? (Enter T/F)");
+                    option = scanner.nextLine().toUpperCase();
+                }
+                if (option.equals("T")) {
+                    System.out.println("Enter new name:");
+                    newDescription = scanner.nextLine();
+                }
+                boolean success = dataManager.editAccountInfo(org.getId(), newName, newDescription);
+                if (success){
+                    System.out.println("Editing Information is successful");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Edit Information failed");
+        }
+
+
+    }
+
 
     public void displayFund(int fundNumber) {
 
@@ -306,18 +359,18 @@ public class UserInterface {
         System.out.println("Name: " + fund.getName());
         System.out.println("Description: " + fund.getDescription());
         System.out.println("Target: $" + fund.getTarget());
-        
+
         // Task 2.3 codes
         List<Donation> donations = fund.getDonations();
         if (!aggregatedDonationsCache.containsKey(fund.getId())) {
             aggregatedDonationsCache.put(fund.getId(), aggregateDonationsByContributor(donations));
         }
         Map<String, AggregatedDonation> aggregatedDonations = aggregatedDonationsCache.get(fund.getId());
-        
+
         List<Map.Entry<String, AggregatedDonation>> sortedAggregatedDonations = new ArrayList<>(aggregatedDonations.entrySet());
-        
+
         // Sort by total amount in descending order	
-        sortedAggregatedDonations.sort((entry1,entry2)->Long.compare(entry2.getValue().totalAmount, entry1.getValue().totalAmount));
+        sortedAggregatedDonations.sort((entry1, entry2) -> Long.compare(entry2.getValue().totalAmount, entry1.getValue().totalAmount));
 
         System.out.println("Aggregated donations:");
         for (Map.Entry<String, AggregatedDonation> entry : sortedAggregatedDonations) {
@@ -330,50 +383,50 @@ public class UserInterface {
         percentageGot *= 100;
         System.out.printf("Total donation amount: $%d (%.2f%% of target)\n", totalDonationAmount, percentageGot);
         System.out.println("Press the Enter key to go back to the listing of funds");
-        
+
         // Task 2.7: Mechanism to enable fund deletion
-        System.out.println("To Delete the Fund: type 'delete' and Press Enter") ;
+        System.out.println("To Delete the Fund: type 'delete' and Press Enter");
         String input = in.nextLine();
         if (Objects.equals(input, "delete")) {
-            confirmDeleteFund(fund) ;
+            confirmDeleteFund(fund);
         }
-        
+
     }
 
     // Task 2.7: Method to confirm whether to delete the fund
     public void confirmDeleteFund(Fund fund) {
-        String input = "" ;
-        int attempts = 0 ;
+        String input = "";
+        int attempts = 0;
         // Allow for 3 attempts
         while (attempts <= 3) {
-            System.out.println("Y: Confirm Deletion?") ;
-            System.out.println("N: Cancel") ;
-            input = in.nextLine().trim() ;
+            System.out.println("Y: Confirm Deletion?");
+            System.out.println("N: Cancel");
+            input = in.nextLine().trim();
 
             if (input.equals("N") || input.equals("n")) {
-                System.out.println("Canceled Deletion.") ;
-                return ;
+                System.out.println("Canceled Deletion.");
+                return;
             }
 
             if (input.equals("Y") || input.equals("y")) {
-                System.out.println("Deleting Fund...") ;
+                System.out.println("Deleting Fund...");
                 try {
-                    this.dataManager.deleteFund(fund.getId()) ;
-                    org.deleteFund(fund) ;
-                    aggregatedDonationsCache.remove(fund.getId()) ;
-                    System.out.println("Delete succeed.") ;
+                    this.dataManager.deleteFund(fund.getId());
+                    org.deleteFund(fund);
+                    aggregatedDonationsCache.remove(fund.getId());
+                    System.out.println("Delete succeed.");
                 } catch (Exception e) {
                     System.out.println("An unexpected error occurred: " + e.getMessage());
                 }
-                return ;
+                return;
             }
 
-            System.out.println("Invalid Input, attempts remaining before cancel: " + (3 - attempts)) ;
-            attempts++ ;
+            System.out.println("Invalid Input, attempts remaining before cancel: " + (3 - attempts));
+            attempts++;
         }
-        
+
     }
-    
+
     // Task 2.3: Method to aggregate the contributor donations
     private Map<String, AggregatedDonation> aggregateDonationsByContributor(List<Donation> donations) {
         Map<String, AggregatedDonation> donationMap = new HashMap<>();
@@ -388,16 +441,16 @@ public class UserInterface {
         }
         return donationMap;
     }
-    
+
     // Task 2.9:
     // Method to list all the contributions
     public void listContributions() {
-    	
+
         List<Donation> allDonations = new ArrayList<>();
         Map<String, String> Id2NameMap = new HashMap<>();
         for (Fund fund : org.getFunds()) {
             allDonations.addAll(fund.getDonations());
-            for (Donation d: fund.getDonations()){
+            for (Donation d : fund.getDonations()) {
                 Id2NameMap.put(d.getFundId(), fund.getName());
             }
         }
@@ -407,13 +460,13 @@ public class UserInterface {
 
         System.out.println("List of all contributions:");
         for (Donation donation : allDonations) {
-        	String fundName = Id2NameMap.get(donation.getFundId());
+            String fundName = Id2NameMap.get(donation.getFundId());
             System.out.printf("Fund Name: %s, Contributor Name: %s, Donation Amount: $%d, Donation Date: %s\n", fundName, donation.getContributorName(), donation.getAmount(), donation.getDate());
         }
 
         System.out.println("Press the Enter key to go back to the listing of funds");
         in.nextLine();
-        
+
     }
 
     // Task 1.10
@@ -424,14 +477,14 @@ public class UserInterface {
         String[] dateArr = donation.getDate().split("T")[0].split("-");
         return String.format("%s/%s/%s", dateArr[1], dateArr[2], dateArr[0]);
     }
-    
-    
+
+
     public static void main(String[] args) {
         DataManager ds = new DataManager(new WebClient("localhost", 3001));
         String login = args.length > 0 ? args[0] : "";
         String password = args.length > 1 ? args[1] : "";
         Scanner scanner = new Scanner(System.in);
-        
+
         Organization org = null;
 
         boolean haveCredentials = (!login.isEmpty() && !password.isEmpty());
@@ -442,7 +495,7 @@ public class UserInterface {
                 try {
                     org = ds.attemptLogin(login, password);
                     if (org == null) {
-                    	// Task 3.1: Give the option to register a new organization with 'r'
+                        // Task 3.1: Give the option to register a new organization with 'r'
                         System.out.println("Login failed. (Y/y) to Enter New Credentials, 'r' to Register New Organization, or anything else to exit");
                         String userRsp = scanner.nextLine().trim().toLowerCase();
                         if (userRsp.equals("r")) {
@@ -454,6 +507,7 @@ public class UserInterface {
                     } else {
                         System.out.println("Login succeed.");
                         UserInterface ui = new UserInterface(ds, org);
+                        ui.cachedLogin = login;
                         exitStatus = ui.start();
                         if (!exitStatus) {
                             return;
@@ -490,8 +544,8 @@ public class UserInterface {
             }
         }
     }
-     
-    
+
+
     // Task 2.3: Define an AggregatedDonation class
     private static class AggregatedDonation {
         int count = 0;
