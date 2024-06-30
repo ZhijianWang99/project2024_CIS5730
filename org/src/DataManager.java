@@ -356,6 +356,7 @@ public class DataManager {
                 Organization org = new Organization(orgId, name, description);
                 return org;
             } else if (status.equals("login exists")) {
+				System.out.println("Login name already exists");
                 throw new IllegalStateException("Login name already exists!");
             } else {
                 throw new IllegalStateException("WebClient responded with an invalid status!");
