@@ -33,7 +33,7 @@ public class UserInterface {
                             System.out.println(count + ": " + f.getName());
                             count++;
                         }
-                        System.out.println("Enter the fund number to see more information.");
+                        System.out.println("Enter the fund number to see more information or make a donation.");
                     }
                     // Task 3.2: Option to change password
                     // Task 3.3
@@ -349,7 +349,6 @@ public class UserInterface {
 
     }
 
-
     public void displayFund(int fundNumber) {
 
         Fund fund = org.getFunds().get(fundNumber - 1);
@@ -386,12 +385,86 @@ public class UserInterface {
 
         // Task 2.7: Mechanism to enable fund deletion
         System.out.println("To Delete the Fund: type 'delete' and Press Enter");
+        // Task 3.4: Donation mechanism
+        System.out.println("To Make a Donation to this Fund: type 'donate' and Press Enter");
         String input = in.nextLine();
         if (Objects.equals(input, "delete")) {
             confirmDeleteFund(fund);
+        } else if (Objects.equals(input, "donate")) {
+            createDonation(fund) ;
         }
 
     }
+
+    // task 3.4: Create Donation Method, given fund
+    public void createDonation(Fund fund) {
+        int attempts = 0 ;
+        String input ;
+        String contributorId = "";
+        while (attempts < 3) {
+            System.out.println("Please Provide Contributor ID");
+            input = in.nextLine();
+            try {
+                if (input != null && !input.trim().equals("")) {
+                    dataManager.getContributorName(input.trim()) ;
+                    System.out.println("Accepted ID...") ;
+                    contributorId = input.trim() ;
+                    attempts = 3 ;
+                } else {
+                    attempts++ ;
+                    System.out.println("Invalid Input, try again --- attempts left: " + (3 - attempts)) ;
+                }
+            } catch (Exception e) {
+                attempts++ ;
+                System.out.println("ID not found or Server Error, try again --- attempts left: " + (3 - attempts)) ;
+            }
+        }
+        if (contributorId.equals("")) {
+            System.out.println("Failed to Provide ID, Exiting Donation Creation...") ;
+            return ;
+        }
+        attempts = 0 ;
+        while (attempts < 3) {
+            System.out.println("Enter Donation Amount:") ;
+            input = in.nextLine();
+            if (input != null && !input.trim().equals("")) {
+                input = input.trim() ;
+                int parsedInput = -1 ;
+                try {
+                    parsedInput = Integer.parseInt(input) ;
+                } catch (Exception e) {
+                    attempts++ ;
+                    System.out.println("Invalid Value, not Integer, try again --- attempts left: " + (3 - attempts)) ;
+                }
+                if (parsedInput > 0) {
+                    try {
+                        dataManager.addDonation(contributorId, fund.getId(), parsedInput) ;
+                        System.out.println("Successful Donation... returning to main menu") ;
+                        // refresh
+                        Organization temp = dataManager.refreshOrg() ;
+                        if (temp == null) {
+                            throw new IllegalStateException("Failed to Connect and Refresh the Menu") ;
+                        }
+                        this.org = temp ;
+                        this.aggregatedDonationsCache.remove(fund.getId()) ; // force refresh in cahce
+                        return ;
+                    } catch (Exception e) {
+                        System.out.println("Error: " + e.getMessage()) ;
+                        //return ;
+                    }
+                } else {
+                    attempts++ ;
+                    System.out.println("Invalid Zero or Negative Donation Value, try again --- attempts left: " + (3 - attempts)) ;
+                }
+            } else {
+                attempts++ ;
+                System.out.println("Null/Empty Input, try again --- attempts left: " + (3 - attempts)) ;
+            }
+        }
+        System.out.println("Failed to provide valid amount, exiting...") ;
+        return ;
+    }
+
 
     // Task 2.7: Method to confirm whether to delete the fund
     public void confirmDeleteFund(Fund fund) {

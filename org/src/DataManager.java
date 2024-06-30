@@ -15,10 +15,12 @@ public class DataManager {
 	
 	// Task 2.1: Cache for storing contributor data
 	private final Map<String, String> contributorDataCache;
+	private String currentUser = null;
+	private String currentPass = null;
 
 	public DataManager(WebClient client) {
 		this.client = client;
-		this.contributorDataCache = new HashMap<>();
+		this.contributorDataCache = new HashMap<>() ;
 	}
 
 	/**
@@ -88,6 +90,8 @@ public class DataManager {
 
 					org.addFund(newFund);
 
+					this.currentUser = login ;
+					this.currentPass = password ;
 				}
 
 				return org;
@@ -104,6 +108,11 @@ public class DataManager {
 			// Communication error with the server
 			throw new IllegalStateException("Error while communicating with the server", e);
 		}
+	}
+
+	// wrapper on attemptLogin to refresh organization data
+	public Organization refreshOrg() {
+		return this.attemptLogin(this.currentUser, this.currentPass) ;
 	}
 
 	/**
@@ -163,6 +172,47 @@ public class DataManager {
 			throw new IllegalStateException("Error while communicating with the server", e);
 			//return null;
 		}	
+	}
+
+	/**
+	 * For Task 3.4
+	 * This method requests to add a donation to a fund using the /makeDonation endpoint
+	 */
+	public void addDonation(String contributorId, String fundId, int amount) {
+		if (client == null) {
+			throw new IllegalStateException("Client is null!") ;
+		}
+		if (contributorId == null) {
+			throw new IllegalArgumentException("ContributorId is null") ;
+		}
+		if (fundId == null) {
+			throw new IllegalArgumentException("fundId is null") ;
+		}
+		if (amount <= 0) {
+			throw new IllegalArgumentException("Amount value is invalid") ;
+		}
+		Map<String, Object> param = new HashMap<>() ;
+		param.put("contributor", contributorId) ;
+		param.put("fund", fundId) ;
+		param.put("amount", String.valueOf(amount)) ;
+		try {
+			String response = client.makeRequest("/makeDonation", param) ;
+
+			if (response == null) {
+				throw new IllegalStateException("WebClient response is null");
+			}
+
+			JSONParser parser = new JSONParser();
+			JSONObject json = (JSONObject) parser.parse(response);
+			String status = (String)json.get("status");
+
+			if (!status.equals("success")) {
+				throw new IllegalStateException("WebClient respond with invalid status!");
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage()) ;
+			throw new IllegalStateException("Error while communicating with the server", e);
+		}
 	}
 
 	/**
