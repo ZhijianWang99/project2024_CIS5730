@@ -410,7 +410,7 @@ public class UserInterface {
         
         // Task 3.4: Donation mechanism
         System.out.println("To Make a Donation to this Fund: type 'donate' and Press Enter");
-        String input = in.nextLine();
+        String input = in.nextLine().trim();
         if (Objects.equals(input, "delete")) {
             confirmDeleteFund(fund);
         } else if (Objects.equals(input, "donate")) {
