@@ -116,7 +116,6 @@ public class DataManager {
 				
 				this.currentUser = login;
 				this.currentPass = password;
-				System.out.println(this.currentUser+" "+this.currentPass);
 
 				return org;
 			} else if (status.equals("login failed")) {
