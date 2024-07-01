@@ -8,7 +8,15 @@ public class UserInterface {
     private Organization org;
     private Scanner in = new Scanner(System.in);
 
+    // Task 3.2 and 3.3: 
     private String cachedLogin;
+    
+    // Setter for cachedLogin
+    public void setCachedLogin(String cachedLogin) {
+        this.cachedLogin = cachedLogin;
+    }
+
+    
     // Task 2.3
     private Map<String, Map<String, AggregatedDonation>> aggregatedDonationsCache = new HashMap<>();
 
@@ -35,12 +43,16 @@ public class UserInterface {
                         }
                         System.out.println("Enter the fund number to see more information or make a donation.");
                     }
-                    // Task 3.2: Option to change password
-                    // Task 3.3
-                    System.out.println("Enter 'c' to change the organization's password");
                     System.out.println("Enter 0 to create a new fund");
+                    
+                    // Task 3.2: Option to change password
+                    System.out.println("Enter 'c' to change the organization's password");
+                    
                     System.out.println("Enter 'l' to list all the contributions");
+                    
+                    // Task 3.3: Option to edit information
                     System.out.println("Enter 'e' to edit the organization name or description");
+                    
                     System.out.println("Enter 'logout' to logout");
                     System.out.println("Enter 'q' or 'quit' to exit.");
 
@@ -64,7 +76,7 @@ public class UserInterface {
                         changePassword();
                     }
                     else if (inputString.equals("e")) {
-                        editAccountInfo(cachedLogin);
+                        editAccountInfo(this.cachedLogin);
                     } else {
                         try {
                             int option = Integer.parseInt(inputString);
@@ -273,6 +285,16 @@ public class UserInterface {
 
         System.out.println("Enter current password:");
         String currentPassword = scanner.nextLine();
+        
+        Organization tempOrg = dataManager.attemptLogin(this.cachedLogin, currentPassword);
+        
+        if (tempOrg == null) {
+            System.out.println("Incorrect Password! Please enter 'c' to try again.");
+            return;
+        }
+        else {
+        	System.out.println("Password is correct!");
+        }
 
         System.out.println("Enter new password:");
         String newPassword = scanner.nextLine();
@@ -300,8 +322,8 @@ public class UserInterface {
     }
 
     /*
-     * Task 3.2
-     * Method to change password
+     * Task 3.3
+     * Method to edit account information
      */
     private void editAccountInfo(String login) {
         Scanner scanner = new Scanner(System.in);
@@ -309,32 +331,32 @@ public class UserInterface {
         String password = scanner.nextLine();
         try {
             Organization tempOrg = dataManager.attemptLogin(login, password);
-            System.out.println(login);
-            System.out.println(password);
+//            System.out.println(login);
+//            System.out.println(password);
             if (tempOrg == null) {
                 System.out.println("Password is wrong, go back to the previous menu.");
             } else {
                 String newName = null;
-                System.out.println("Edit name? (Enter T/F)");
+                System.out.println("Edit name? (Enter Y/N)");
                 String option = scanner.nextLine().toUpperCase();
-                while (!option.equals("T") && !option.equals("F")) {
-                    System.out.println("Edit name? (Enter T/F)");
+                while (!option.equals("Y") && !option.equals("N")) {
+                    System.out.println("Invalid response! Edit name? (Enter Y/N)");
                     option = scanner.nextLine().toUpperCase().strip();
                 }
-                if (option.equals("T")) {
+                if (option.equals("Y")) {
                     System.out.println("Enter new name:");
                     newName = scanner.nextLine();
                 }
 
                 String newDescription = null;
-                System.out.println("Edit Description? (Enter T/F)");
+                System.out.println("Edit Description? (Enter Y/N)");
                 option = scanner.nextLine().toUpperCase().strip();
-                while (!option.equals("T") && !option.equals("F")) {
-                    System.out.println("Edit Description? (Enter T/F)");
+                while (!option.equals("Y") && !option.equals("N")) {
+                    System.out.println("Invalid response! Edit Description? (Enter Y/N)");
                     option = scanner.nextLine().toUpperCase();
                 }
-                if (option.equals("T")) {
-                    System.out.println("Enter new name:");
+                if (option.equals("Y")) {
+                    System.out.println("Enter new description:");
                     newDescription = scanner.nextLine();
                 }
                 boolean success = dataManager.editAccountInfo(org.getId(), newName, newDescription);
@@ -385,6 +407,7 @@ public class UserInterface {
 
         // Task 2.7: Mechanism to enable fund deletion
         System.out.println("To Delete the Fund: type 'delete' and Press Enter");
+        
         // Task 3.4: Donation mechanism
         System.out.println("To Make a Donation to this Fund: type 'donate' and Press Enter");
         String input = in.nextLine();
@@ -396,7 +419,9 @@ public class UserInterface {
 
     }
 
-    // task 3.4: Create Donation Method, given fund
+    /*
+     *  Task 3.4: Create Donation Method, given fund
+     */
     public void createDonation(Fund fund) {
         int attempts = 0 ;
         String input ;
@@ -446,11 +471,11 @@ public class UserInterface {
                             throw new IllegalStateException("Failed to Connect and Refresh the Menu") ;
                         }
                         this.org = temp ;
-                        this.aggregatedDonationsCache.remove(fund.getId()) ; // force refresh in cahce
+                        this.aggregatedDonationsCache.remove(fund.getId()) ; // force refresh in cache
                         return ;
                     } catch (Exception e) {
                         System.out.println("Error: " + e.getMessage()) ;
-                        //return ;
+                        return;
                     }
                 } else {
                     attempts++ ;
@@ -559,6 +584,7 @@ public class UserInterface {
         Scanner scanner = new Scanner(System.in);
 
         Organization org = null;
+        UserInterface ui;
 
         boolean haveCredentials = (!login.isEmpty() && !password.isEmpty());
         boolean exitStatus;
@@ -579,8 +605,8 @@ public class UserInterface {
                         }
                     } else {
                         System.out.println("Login succeed.");
-                        UserInterface ui = new UserInterface(ds, org);
-                        ui.cachedLogin = login;
+                        ui = new UserInterface(ds, org);
+                        ui.setCachedLogin(login);
                         exitStatus = ui.start();
                         if (!exitStatus) {
                             return;
@@ -606,7 +632,8 @@ public class UserInterface {
                     return;
                 }
                 if (respStr.equals("r")) {
-                    new UserInterface(ds, null).registerNewOrganization();
+                	ui = new UserInterface(ds, null);
+                	ui.registerNewOrganization();
                 } else {
                     System.out.println("Enter login:");
                     login = scanner.nextLine();

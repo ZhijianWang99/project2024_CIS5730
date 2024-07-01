@@ -17,9 +17,11 @@ public class DataManager_changePassword_Test {
                 return null;
             }
         });
-
+        
+        assertNull(dm.getCurrentPass());
         boolean result = dm.changePassword("orgId1", "currentPassword", "newPassword");
         assertTrue(result);
+        assertTrue(dm.getCurrentPass().equals("newPassword"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -33,8 +35,10 @@ public class DataManager_changePassword_Test {
                 return null;
             }
         });
-
+        
+        assertNull(dm.getCurrentPass());
         dm.changePassword("orgId1", "incorrectPassword", "newPassword");
+        assertNull(dm.getCurrentPass());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -48,8 +52,10 @@ public class DataManager_changePassword_Test {
                 return null;
             }
         });
-
+        
+        assertNull(dm.getCurrentPass());
         dm.changePassword("orgId1", "currentPassword", "newPassword");
+        assertNull(dm.getCurrentPass());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -60,8 +66,10 @@ public class DataManager_changePassword_Test {
                 return null;
             }
         });
-
+        
+        assertNull(dm.getCurrentPass());
         dm.changePassword("orgId1", "currentPassword", "newPassword");
+        assertNull(dm.getCurrentPass());
     }
     
     @Test(expected = IllegalStateException.class)
@@ -73,7 +81,9 @@ public class DataManager_changePassword_Test {
             }
         });
 
+        assertNull(dm.getCurrentPass());
         dm.changePassword("orgId1", "currentPassword", "newPassword");
+        assertNull(dm.getCurrentPass());
     }
     
     @Test(expected = IllegalStateException.class)
@@ -85,7 +95,9 @@ public class DataManager_changePassword_Test {
             }
         });
 
+        assertNull(dm.getCurrentPass());
         dm.changePassword("orgId1", "currentPassword", "newPassword");
+        assertNull(dm.getCurrentPass());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -97,35 +109,45 @@ public class DataManager_changePassword_Test {
             }
         });
 
+        assertNull(dm.getCurrentPass());
         dm.changePassword("orgId1", "currentPassword", "newPassword");
+        assertNull(dm.getCurrentPass());
     }
 
     @Test(expected = IllegalStateException.class)
     public void testChangePasswordClientNull() {
         DataManager dm = new DataManager(null);
 
+        assertNull(dm.getCurrentPass());
         dm.changePassword("orgId1", "currentPassword", "newPassword");
+        assertNull(dm.getCurrentPass());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testChangePasswordOrgIdNull() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001));
 
+        assertNull(dm.getCurrentPass());
         dm.changePassword(null, "currentPassword", "newPassword");
+        assertNull(dm.getCurrentPass());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testChangePasswordCurrentPasswordNull() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001));
 
+        assertNull(dm.getCurrentPass());
         dm.changePassword("orgId1", null, "newPassword");
+        assertNull(dm.getCurrentPass());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testChangePasswordNewPasswordNull() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001));
 
+        assertNull(dm.getCurrentPass());
         dm.changePassword("orgId1", "currentPassword", null);
+        assertNull(dm.getCurrentPass());
     }
     
     @Test(expected = IllegalStateException.class)
@@ -137,7 +159,9 @@ public class DataManager_changePassword_Test {
             }
         });
 
+        assertNull(dm.getCurrentPass());
         dm.changePassword("orgId1", "currentPassword", "newPassword");
+        assertNull(dm.getCurrentPass());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -149,6 +173,8 @@ public class DataManager_changePassword_Test {
             }
         });
 
+        assertNull(dm.getCurrentPass());
         dm.changePassword("orgId1", "currentPassword", "newPassword");
+        assertNull(dm.getCurrentPass());
     }
 }

@@ -15,8 +15,30 @@ public class DataManager {
 	
 	// Task 2.1: Cache for storing contributor data
 	private final Map<String, String> contributorDataCache;
+	
+	// Private variables added in Task 3
 	private String currentUser = null;
 	private String currentPass = null;
+	
+	// Getter for currentUser added in Task 3
+    public String getCurrentUser() {
+        return this.currentUser;
+    }
+    
+    // Getter for currentPass added in Task 3
+    public String getCurrentPass() {
+        return this.currentPass;
+    }
+    
+    // Setter for currentUser added in Task 3
+    public void setCurrentUser(String a) {
+        this.currentUser = a;
+    }
+    
+    // Setter for currentPass added in Task 3
+    public void setCurrentPass(String a) {
+        this.currentPass = a;
+    }
 
 	public DataManager(WebClient client) {
 		this.client = client;
@@ -89,10 +111,12 @@ public class DataManager {
 					newFund.setDonations(donationList);
 
 					org.addFund(newFund);
-
-					this.currentUser = login ;
-					this.currentPass = password ;
+					
 				}
+				
+				this.currentUser = login;
+				this.currentPass = password;
+				System.out.println(this.currentUser+" "+this.currentPass);
 
 				return org;
 			} else if (status.equals("login failed")) {
@@ -110,7 +134,10 @@ public class DataManager {
 		}
 	}
 
-	// wrapper on attemptLogin to refresh organization data
+	/*
+	 * Task 3.4
+	 * A  wrapper method on attemptLogin to refresh organization data
+	 */
 	public Organization refreshOrg() {
 		return this.attemptLogin(this.currentUser, this.currentPass) ;
 	}
@@ -132,7 +159,8 @@ public class DataManager {
 		
 		// Task 2.1: Check with the cache first
         if (contributorDataCache.containsKey(id)) {
-        	String outputCache=contributorDataCache.get(id);System.out.println("<Trivial> Cache found: "+outputCache);
+        	String outputCache=contributorDataCache.get(id);
+        	// System.out.println("<Trivial> Cache found: "+outputCache);
             return outputCache;
         }
 
@@ -155,7 +183,8 @@ public class DataManager {
 				String name = (String)json.get("data");
 				
 				// Task 2.1: Add contributor name to cache
-				contributorDataCache.put(id, name);System.out.println("<Trivial> Cache add name: "+name);
+				contributorDataCache.put(id, name);
+				// System.out.println("<Trivial> Cache add name: "+name);
 				return name;
 				
 			}
@@ -406,6 +435,7 @@ public class DataManager {
             String status = (String) json.get("status");
 
             if (status.equals("success")) {
+				this.currentPass = newPassword;
                 return true;
             } else if (status.equals("incorrect password")) {
                 throw new IllegalArgumentException("Current password is incorrect!");
@@ -419,7 +449,8 @@ public class DataManager {
             throw new IllegalStateException("Error while communicating with the server", e);
         }
     }
-	/**
+	
+    /**
 	 * Task 3.3
 	 * Method to edit the name or description
 	 * This method employs the /editAccount endpoint in the API
