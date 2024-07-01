@@ -57,7 +57,7 @@ public class UserInterface {
                     System.out.println("Enter 'q' or 'quit' to exit.");
 
 
-                    String inputString = in.nextLine();
+                    String inputString = in.nextLine().trim();
 
                     if (inputString.equals("quit") || inputString.equals("q")) {
                         System.out.println("Good bye!");
