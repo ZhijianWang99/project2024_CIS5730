@@ -338,10 +338,10 @@ public class UserInterface {
             } else {
                 String newName = null;
                 System.out.println("Edit name? (Enter Y/N)");
-                String option = scanner.nextLine().toUpperCase();
+                String option = scanner.nextLine().strip().toUpperCase();
                 while (!option.equals("Y") && !option.equals("N")) {
                     System.out.println("Invalid response! Edit name? (Enter Y/N)");
-                    option = scanner.nextLine().toUpperCase().strip();
+                    option = scanner.nextLine().strip().toUpperCase();
                 }
                 if (option.equals("Y")) {
                     System.out.println("Enter new name:");
@@ -350,10 +350,10 @@ public class UserInterface {
 
                 String newDescription = null;
                 System.out.println("Edit Description? (Enter Y/N)");
-                option = scanner.nextLine().toUpperCase().strip();
+                option = scanner.nextLine().strip().toUpperCase();
                 while (!option.equals("Y") && !option.equals("N")) {
                     System.out.println("Invalid response! Edit Description? (Enter Y/N)");
-                    option = scanner.nextLine().toUpperCase();
+                    option = scanner.nextLine().strip().toUpperCase();
                 }
                 if (option.equals("Y")) {
                     System.out.println("Enter new description:");
